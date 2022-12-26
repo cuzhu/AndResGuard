@@ -204,17 +204,6 @@ public class TanTanARSCDecoder {
     reWriteTable();
   }
 
-  private void generalFileResMapping() throws IOException {
-    mMappingWriter.write("res path mapping:\n");
-    for (String raw : mOldFileName.keySet()) {
-      mMappingWriter.write("    " + raw + " -> " + mOldFileName.get(raw));
-      mMappingWriter.write("\n");
-    }
-    mMappingWriter.write("\n\n");
-    mMappingWriter.write("res id mapping:\n");
-    mMappingWriter.flush();
-  }
-
   private void generalResIDMapping(
       String packageName, String typename, String specName, String replace) throws IOException {
     mMappingWriter.write(
@@ -582,9 +571,9 @@ public class TanTanARSCDecoder {
     }
     generalResIDMapping(
         mPkg.getName(), mType.getName(), mSpecNames.get(specNamesId).toString(), replaceString);
-    mPkg.putSpecNamesReplace(mResId, unicodeToUtf8(replaceString));
-    mPkg.putSpecNamesblock(unicodeToUtf8(replaceString), unicodeToUtf8(replaceString));
-    mType.putSpecResguardName(unicodeToUtf8(replaceString));
+    mPkg.putSpecNamesReplace(mResId, replaceString);
+    mPkg.putSpecNamesblock(unicodeToUtf8(replaceString), replaceString);
+    mType.putSpecResguardName(replaceString);
   }
 
   private void writeEntry() throws IOException, AndrolibException {

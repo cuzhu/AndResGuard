@@ -255,7 +255,7 @@ public class StringBlock {
     totalSize += 6 * 4 + 4 * stringCount + 4 * styleOffsetCount;
     stringsOffset = totalSize;
 
-    byte[] strings = new byte[block.m_strings.length];
+    byte[] strings = new byte[block.m_strings.length * 2];
     int[] stringOffsets = new int[stringCount];
     System.arraycopy(block.m_stringOffsets, 0, stringOffsets, 0, stringOffsets.length);
 
@@ -270,15 +270,9 @@ public class StringBlock {
             (i == (stringCount - 1))
                 ? (block.m_strings.length - block.m_stringOffsets[i])
                 : (block.m_stringOffsets[i + 1] - block.m_stringOffsets[i]);
-        try {
-          System.arraycopy(block.m_strings, block.m_stringOffsets[i], strings, offset, copyLen);
-          offset += copyLen;
-          totalSize += copyLen;
-        } catch (IndexOutOfBoundsException e) {
-          System.out.printf(
-              "==i==%s==block.m_strings====%s===block.m_stringOffsets[i]====%s========offset====%s=======copyLen=====%s\n",
-              i, block.m_strings.length, block.m_stringOffsets[i], offset, copyLen);
-        }
+        System.arraycopy(block.m_strings, block.m_stringOffsets[i], strings, offset, copyLen);
+        offset += copyLen;
+        totalSize += copyLen;
       } else {
         String name = tableProguardMap.get(i);
         if (block.m_isUTF8) {

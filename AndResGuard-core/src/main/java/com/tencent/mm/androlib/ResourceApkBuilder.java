@@ -388,7 +388,8 @@ public class ResourceApkBuilder {
         if (!metaFileName.endsWith(".MF")
             && !metaFileName.endsWith(".RSA")
             && !metaFileName.endsWith(".SF")) {
-          System.out.println(String.format("add meta file %s", metaFile.getAbsolutePath()));
+          //          System.out.println(String.format("add meta file %s",
+          // metaFile.getAbsolutePath()));
           collectFiles.add(metaFile);
         }
       }
