@@ -7,6 +7,7 @@ import com.tencent.mm.androlib.res.decoder.ARSCDecoder;
 import com.tencent.mm.androlib.res.util.StringUtil;
 import com.tencent.mm.directory.DirectoryException;
 import com.tencent.mm.util.FileOperation;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -22,10 +23,9 @@ public class Main {
   protected static String mRunningLocation;
   protected static long mBeginTime;
 
-  /**
-   * 是否通过命令行方式设置
-   **/
+  /** 是否通过命令行方式设置 */
   public boolean mSetSignThroughCmd;
+
   public boolean mSetMappingThroughCmd;
   public String m7zipPath;
   public String mZipalignPath;
@@ -46,21 +46,20 @@ public class Main {
       Thread currentThread = Thread.currentThread();
       System.out.printf(
           "\n-->AndResGuard starting! Current thread# id: %d, name: %s\n",
-          currentThread.getId(),
-          currentThread.getName()
-      );
-      File finalApkFile = StringUtil.isPresent(inputParam.finalApkBackupPath) ?
-          new File(inputParam.finalApkBackupPath)
-          : null;
+          currentThread.getId(), currentThread.getName());
+      File finalApkFile =
+          StringUtil.isPresent(inputParam.finalApkBackupPath)
+              ? new File(inputParam.finalApkBackupPath)
+              : null;
 
       resourceProguard(
           new File(inputParam.outFolder),
           finalApkFile,
           inputParam.apkPath,
           inputParam.signatureType,
-          inputParam.minSDKVersion
-      );
-      System.out.printf("<--AndResGuard Done! You can find the output in %s\n", mOutDir.getAbsolutePath());
+          inputParam.minSDKVersion);
+      System.out.printf(
+          "<--AndResGuard Done! You can find the output in %s\n", mOutDir.getAbsolutePath());
       clean();
     }
   }
@@ -85,7 +84,11 @@ public class Main {
   }
 
   protected void resourceProguard(
-      File outputDir, File outputFile, String apkFilePath, InputParam.SignatureType signatureType, int minSDKVersoin) {
+      File outputDir,
+      File outputFile,
+      String apkFilePath,
+      InputParam.SignatureType signatureType,
+      int minSDKVersoin) {
     File apkFile = new File(apkFilePath);
     if (!apkFile.exists()) {
       System.err.printf("The input apk %s does not exist", apkFile.getAbsolutePath());
@@ -106,7 +109,9 @@ public class Main {
   private void decodeResource(File outputFile, ApkDecoder decoder, File apkFile)
       throws AndrolibException, IOException, DirectoryException {
     if (outputFile == null) {
-      mOutDir = new File(mRunningLocation, apkFile.getName().substring(0, apkFile.getName().indexOf(".apk")));
+      mOutDir =
+          new File(
+              mRunningLocation, apkFile.getName().substring(0, apkFile.getName().indexOf(".apk")));
     } else {
       mOutDir = outputFile;
     }
@@ -115,7 +120,11 @@ public class Main {
   }
 
   private void buildApk(
-      ApkDecoder decoder, File apkFile, File outputFile, InputParam.SignatureType signatureType, int minSDKVersion)
+      ApkDecoder decoder,
+      File apkFile,
+      File outputFile,
+      InputParam.SignatureType signatureType,
+      int minSDKVersion)
       throws Exception {
     ResourceApkBuilder builder = new ResourceApkBuilder(config);
     String apkBasename = apkFile.getName();

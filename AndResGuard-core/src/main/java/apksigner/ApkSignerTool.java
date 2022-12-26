@@ -19,6 +19,7 @@ package apksigner;
 import com.android.apksig.ApkSigner;
 import com.android.apksig.ApkVerifier;
 import com.android.apksig.apk.MinSdkVersionException;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,6 +57,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+
 import javax.crypto.EncryptedPrivateKeyInfo;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -96,7 +98,8 @@ public class ApkSignerTool {
         System.out.println(VERSION);
         return;
       } else {
-        throw new ParameterException("Unsupported command: " + cmd + ". See --help for supported commands");
+        throw new ParameterException(
+            "Unsupported command: " + cmd + ". See --help for supported commands");
       }
     } catch (ParameterException | OptionsParser.OptionsException e) {
       System.err.println(e.getMessage());
@@ -143,7 +146,7 @@ public class ApkSignerTool {
         v1SigningEnabled = optionsParser.getOptionalBooleanValue(true);
       } else if ("v2-signing-enabled".equals(optionName)) {
         v2SigningEnabled = optionsParser.getOptionalBooleanValue(true);
-      }  else if ("v3-signing-enabled".equals(optionName)) {
+      } else if ("v3-signing-enabled".equals(optionName)) {
         v3SigningEnabled = optionsParser.getOptionalBooleanValue(false);
       } else if ("next-signer".equals(optionName)) {
         if (!signerParams.isEmpty()) {
@@ -159,15 +162,19 @@ public class ApkSignerTool {
       } else if ("key-pass".equals(optionName)) {
         signerParams.keyPasswordSpec = optionsParser.getRequiredValue("Key password");
       } else if ("v1-signer-name".equals(optionName)) {
-        signerParams.v1SigFileBasename = optionsParser.getRequiredValue("JAR signature file basename");
+        signerParams.v1SigFileBasename =
+            optionsParser.getRequiredValue("JAR signature file basename");
       } else if ("ks-type".equals(optionName)) {
         signerParams.keystoreType = optionsParser.getRequiredValue("KeyStore type");
       } else if ("ks-provider-name".equals(optionName)) {
-        signerParams.keystoreProviderName = optionsParser.getRequiredValue("JCA KeyStore Provider name");
+        signerParams.keystoreProviderName =
+            optionsParser.getRequiredValue("JCA KeyStore Provider name");
       } else if ("ks-provider-class".equals(optionName)) {
-        signerParams.keystoreProviderClass = optionsParser.getRequiredValue("JCA KeyStore Provider class name");
+        signerParams.keystoreProviderClass =
+            optionsParser.getRequiredValue("JCA KeyStore Provider class name");
       } else if ("ks-provider-arg".equals(optionName)) {
-        signerParams.keystoreProviderArg = optionsParser.getRequiredValue("JCA KeyStore Provider constructor argument");
+        signerParams.keystoreProviderArg =
+            optionsParser.getRequiredValue("JCA KeyStore Provider constructor argument");
       } else if ("key".equals(optionName)) {
         signerParams.keyFile = optionsParser.getRequiredValue("Private key file");
       } else if ("cert".equals(optionName)) {
@@ -175,10 +182,11 @@ public class ApkSignerTool {
       } else if (("v".equals(optionName)) || ("verbose".equals(optionName))) {
         verbose = optionsParser.getOptionalBooleanValue(true);
       } else {
-        throw new ParameterException("Unsupported option: "
-                                     + optionOriginalForm
-                                     + ". See --help for supported"
-                                     + " options.");
+        throw new ParameterException(
+            "Unsupported option: "
+                + optionOriginalForm
+                + ". See --help for supported"
+                + " options.");
       }
     }
     if (!signerParams.isEmpty()) {
@@ -195,7 +203,8 @@ public class ApkSignerTool {
       // Input APK has been specified via preceding parameters. We don't expect any more
       // parameters.
       if (params.length > 0) {
-        throw new ParameterException("Unexpected parameter(s) after " + optionOriginalForm + ": " + params[0]);
+        throw new ParameterException(
+            "Unexpected parameter(s) after " + optionOriginalForm + ": " + params[0]);
       }
     } else {
       // Input APK has not been specified via preceding parameters. The next parameter is
@@ -208,7 +217,8 @@ public class ApkSignerTool {
       inputApk = new File(params[0]);
     }
     if ((minSdkVersionSpecified) && (minSdkVersion > maxSdkVersion)) {
-      throw new ParameterException("Min API Level (" + minSdkVersion + ") > max API Level (" + maxSdkVersion + ")");
+      throw new ParameterException(
+          "Min API Level (" + minSdkVersion + ") > max API Level (" + maxSdkVersion + ")");
     }
 
     List<ApkSigner.SignerConfig> signerConfigs = new ArrayList<>(signers.size());
@@ -245,10 +255,9 @@ public class ApkSignerTool {
         } else {
           throw new RuntimeException("Neither KeyStore key alias nor private key file available");
         }
-        ApkSigner.SignerConfig signerConfig = new ApkSigner.SignerConfig.Builder(v1SigBasename,
-            signer.privateKey,
-            signer.certs
-        ).build();
+        ApkSigner.SignerConfig signerConfig =
+            new ApkSigner.SignerConfig.Builder(v1SigBasename, signer.privateKey, signer.certs)
+                .build();
         signerConfigs.add(signerConfig);
       }
     }
@@ -263,12 +272,14 @@ public class ApkSignerTool {
     } else {
       tmpOutputApk = outputApk;
     }
-    ApkSigner.Builder apkSignerBuilder = new ApkSigner.Builder(signerConfigs).setInputApk(inputApk)
-        .setOutputApk(tmpOutputApk)
-        .setOtherSignersSignaturesPreserved(false)
-        .setV1SigningEnabled(v1SigningEnabled)
-        .setV2SigningEnabled(v2SigningEnabled)
-        .setV3SigningEnabled(v3SigningEnabled);
+    ApkSigner.Builder apkSignerBuilder =
+        new ApkSigner.Builder(signerConfigs)
+            .setInputApk(inputApk)
+            .setOutputApk(tmpOutputApk)
+            .setOtherSignersSignaturesPreserved(false)
+            .setV1SigningEnabled(v1SigningEnabled)
+            .setV2SigningEnabled(v2SigningEnabled)
+            .setV3SigningEnabled(v3SigningEnabled);
     if (minSdkVersionSpecified) {
       apkSignerBuilder.setMinSdkVersion(minSdkVersion);
     }
@@ -280,8 +291,10 @@ public class ApkSignerTool {
       if (!msg.endsWith(".")) {
         msg += '.';
       }
-      throw new MinSdkVersionException("Failed to determine APK's minimum supported platform version"
-                                       + ". Use --min-sdk-version to override", e);
+      throw new MinSdkVersionException(
+          "Failed to determine APK's minimum supported platform version"
+              + ". Use --min-sdk-version to override",
+          e);
     }
     if (!tmpOutputApk.getCanonicalPath().equals(outputApk.getCanonicalPath())) {
       Files.move(tmpOutputApk.toPath(), outputApk.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -329,10 +342,11 @@ public class ApkSignerTool {
       } else if ("in".equals(optionName)) {
         inputApk = new File(optionsParser.getRequiredValue("Input APK file"));
       } else {
-        throw new ParameterException("Unsupported option: "
-                                     + optionOriginalForm
-                                     + ". See --help for supported"
-                                     + " options.");
+        throw new ParameterException(
+            "Unsupported option: "
+                + optionOriginalForm
+                + ". See --help for supported"
+                + " options.");
       }
     }
     params = optionsParser.getRemainingParams();
@@ -341,7 +355,8 @@ public class ApkSignerTool {
       // Input APK has been specified in preceding parameters. We don't expect any more
       // parameters.
       if (params.length > 0) {
-        throw new ParameterException("Unexpected parameter(s) after " + optionOriginalForm + ": " + params[0]);
+        throw new ParameterException(
+            "Unexpected parameter(s) after " + optionOriginalForm + ": " + params[0]);
       }
     } else {
       // Input APK has not been specified in preceding parameters. The next parameter is
@@ -355,7 +370,8 @@ public class ApkSignerTool {
     }
 
     if ((minSdkVersionSpecified) && (maxSdkVersionSpecified) && (minSdkVersion > maxSdkVersion)) {
-      throw new ParameterException("Min API Level (" + minSdkVersion + ") > max API Level (" + maxSdkVersion + ")");
+      throw new ParameterException(
+          "Min API Level (" + minSdkVersion + ") > max API Level (" + maxSdkVersion + ")");
     }
 
     ApkVerifier.Builder apkVerifierBuilder = new ApkVerifier.Builder(inputApk);
@@ -374,8 +390,10 @@ public class ApkSignerTool {
       if (!msg.endsWith(".")) {
         msg += '.';
       }
-      throw new MinSdkVersionException("Failed to determine APK's minimum supported platform version"
-                                       + ". Use --min-sdk-version to override", e);
+      throw new MinSdkVersionException(
+          "Failed to determine APK's minimum supported platform version"
+              + ". Use --min-sdk-version to override",
+          e);
     }
     boolean verified = result.isVerified();
 
@@ -384,8 +402,11 @@ public class ApkSignerTool {
       List<X509Certificate> signerCerts = result.getSignerCertificates();
       if (verbose) {
         System.out.println("Verifies");
-        System.out.println("Verified using v1 scheme (JAR signing): " + result.isVerifiedUsingV1Scheme());
-        System.out.println("Verified using v2 scheme (APK Signature Scheme v2): " + result.isVerifiedUsingV2Scheme());
+        System.out.println(
+            "Verified using v1 scheme (JAR signing): " + result.isVerifiedUsingV1Scheme());
+        System.out.println(
+            "Verified using v2 scheme (APK Signature Scheme v2): "
+                + result.isVerifiedUsingV2Scheme());
         System.out.println("Number of signers: " + signerCerts.size());
       }
       if (printCerts) {
@@ -395,19 +416,28 @@ public class ApkSignerTool {
         MessageDigest md5 = MessageDigest.getInstance("MD5");
         for (X509Certificate signerCert : signerCerts) {
           signerNumber++;
-          System.out.println("Signer #" + signerNumber + " certificate DN" + ": " + signerCert.getSubjectDN());
+          System.out.println(
+              "Signer #" + signerNumber + " certificate DN" + ": " + signerCert.getSubjectDN());
           byte[] encodedCert = signerCert.getEncoded();
-          System.out.println("Signer #"
-                             + signerNumber
-                             + " certificate SHA-256 digest: "
-                             + HexEncoding.encode(sha256.digest(encodedCert)));
-          System.out.println("Signer #" + signerNumber + " certificate SHA-1 digest: " + HexEncoding.encode(sha1.digest(
-              encodedCert)));
-          System.out.println("Signer #" + signerNumber + " certificate MD5 digest: " + HexEncoding.encode(md5.digest(
-              encodedCert)));
+          System.out.println(
+              "Signer #"
+                  + signerNumber
+                  + " certificate SHA-256 digest: "
+                  + HexEncoding.encode(sha256.digest(encodedCert)));
+          System.out.println(
+              "Signer #"
+                  + signerNumber
+                  + " certificate SHA-1 digest: "
+                  + HexEncoding.encode(sha1.digest(encodedCert)));
+          System.out.println(
+              "Signer #"
+                  + signerNumber
+                  + " certificate MD5 digest: "
+                  + HexEncoding.encode(md5.digest(encodedCert)));
           if (verbose) {
             PublicKey publicKey = signerCert.getPublicKey();
-            System.out.println("Signer #" + signerNumber + " key algorithm: " + publicKey.getAlgorithm());
+            System.out.println(
+                "Signer #" + signerNumber + " key algorithm: " + publicKey.getAlgorithm());
             int keySize = -1;
             if (publicKey instanceof RSAKey) {
               keySize = ((RSAKey) publicKey).getModulus().bitLength();
@@ -421,19 +451,27 @@ public class ApkSignerTool {
                 keySize = dsaParams.getP().bitLength();
               }
             }
-            System.out.println("Signer #" + signerNumber + " key size (bits): " + ((keySize != -1) ? String.valueOf(
-                keySize) : "n/a"));
+            System.out.println(
+                "Signer #"
+                    + signerNumber
+                    + " key size (bits): "
+                    + ((keySize != -1) ? String.valueOf(keySize) : "n/a"));
             byte[] encodedKey = publicKey.getEncoded();
-            System.out.println("Signer #"
-                               + signerNumber
-                               + " public key SHA-256 digest: "
-                               + HexEncoding.encode(sha256.digest(encodedKey)));
-            System.out.println("Signer #"
-                               + signerNumber
-                               + " public key SHA-1 digest: "
-                               + HexEncoding.encode(sha1.digest(encodedKey)));
-            System.out.println("Signer #" + signerNumber + " public key MD5 digest: " + HexEncoding.encode(md5.digest(
-                encodedKey)));
+            System.out.println(
+                "Signer #"
+                    + signerNumber
+                    + " public key SHA-256 digest: "
+                    + HexEncoding.encode(sha256.digest(encodedKey)));
+            System.out.println(
+                "Signer #"
+                    + signerNumber
+                    + " public key SHA-1 digest: "
+                    + HexEncoding.encode(sha1.digest(encodedKey)));
+            System.out.println(
+                "Signer #"
+                    + signerNumber
+                    + " public key MD5 digest: "
+                    + HexEncoding.encode(md5.digest(encodedKey)));
           }
         }
       }
@@ -446,7 +484,7 @@ public class ApkSignerTool {
     }
 
     @SuppressWarnings("resource") // false positive -- this resource is not opened here
-        PrintStream warningsOut = (warningsTreatedAsErrors) ? System.err : System.out;
+    PrintStream warningsOut = (warningsTreatedAsErrors) ? System.err : System.out;
     for (ApkVerifier.IssueWithParams warning : result.getWarnings()) {
       warningsEncountered = true;
       warningsOut.println("WARNING: " + warning);
@@ -483,10 +521,10 @@ public class ApkSignerTool {
   }
 
   private static void printUsage(String page) {
-    try (BufferedReader in = new BufferedReader(new InputStreamReader(
-        ApkSignerTool.class.getResourceAsStream(page),
-        StandardCharsets.UTF_8
-    ))) {
+    try (BufferedReader in =
+        new BufferedReader(
+            new InputStreamReader(
+                ApkSignerTool.class.getResourceAsStream(page), StandardCharsets.UTF_8))) {
       String line;
       while ((line = in.readLine()) != null) {
         System.out.println(line);
@@ -532,7 +570,8 @@ public class ApkSignerTool {
     PrivateKey privateKey;
     List<X509Certificate> certs;
 
-    private static void loadKeyStoreFromFile(KeyStore ks, String file, List<char[]> passwords) throws Exception {
+    private static void loadKeyStoreFromFile(KeyStore ks, String file, List<char[]> passwords)
+        throws Exception {
       Exception lastFailure = null;
       for (char[] password : passwords) {
         try {
@@ -571,7 +610,8 @@ public class ApkSignerTool {
     private static PKCS8EncodedKeySpec decryptPkcs8EncodedKey(
         EncryptedPrivateKeyInfo encryptedPrivateKeyInfo, List<char[]> passwords)
         throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
-      SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(encryptedPrivateKeyInfo.getAlgName());
+      SecretKeyFactory keyFactory =
+          SecretKeyFactory.getInstance(encryptedPrivateKeyInfo.getAlgName());
       InvalidKeySpecException lastKeySpecException = null;
       InvalidKeyException lastKeyException = null;
       for (char[] password : passwords) {
@@ -613,19 +653,19 @@ public class ApkSignerTool {
 
     private boolean isEmpty() {
       return (name == null)
-             && (keystoreFile == null)
-             && (keystoreKeyAlias == null)
-             && (keystorePasswordSpec == null)
-             && (keyPasswordSpec == null)
-             && (keystoreType == null)
-             && (keystoreProviderName == null)
-             && (keystoreProviderClass == null)
-             && (keystoreProviderArg == null)
-             && (keyFile == null)
-             && (certFile == null)
-             && (v1SigFileBasename == null)
-             && (privateKey == null)
-             && (certs == null);
+          && (keystoreFile == null)
+          && (keystoreKeyAlias == null)
+          && (keystorePasswordSpec == null)
+          && (keyPasswordSpec == null)
+          && (keystoreType == null)
+          && (keystoreProviderName == null)
+          && (keystoreProviderClass == null)
+          && (keystoreProviderArg == null)
+          && (keyFile == null)
+          && (certFile == null)
+          && (v1SigFileBasename == null)
+          && (privateKey == null)
+          && (certs == null);
     }
 
     private void loadPrivateKeyAndCerts(PasswordRetriever passwordRetriever) throws Exception {
@@ -639,11 +679,13 @@ public class ApkSignerTool {
       } else if (keyFile != null) {
         loadPrivateKeyAndCertsFromFiles(passwordRetriever);
       } else {
-        throw new ParameterException("KeyStore (--ks) or private key file (--key) must be specified");
+        throw new ParameterException(
+            "KeyStore (--ks) or private key file (--key) must be specified");
       }
     }
 
-    private void loadPrivateKeyAndCertsFromKeyStore(PasswordRetriever passwordRetriever) throws Exception {
+    private void loadPrivateKeyAndCertsFromKeyStore(PasswordRetriever passwordRetriever)
+        throws Exception {
       if (keystoreFile == null) {
         throw new ParameterException("KeyStore (--ks) must be specified");
       }
@@ -658,15 +700,18 @@ public class ApkSignerTool {
         // Use a new Provider instance (does not require the provider to be installed)
         Class<?> ksProviderClass = Class.forName(keystoreProviderClass);
         if (!Provider.class.isAssignableFrom(ksProviderClass)) {
-          throw new ParameterException("Keystore Provider class "
-                                       + keystoreProviderClass
-                                       + " not subclass of "
-                                       + Provider.class.getName());
+          throw new ParameterException(
+              "Keystore Provider class "
+                  + keystoreProviderClass
+                  + " not subclass of "
+                  + Provider.class.getName());
         }
         Provider ksProvider;
         if (keystoreProviderArg != null) {
           // Single-arg Provider constructor
-          ksProvider = (Provider) ksProviderClass.getConstructor(String.class).newInstance(keystoreProviderArg);
+          ksProvider =
+              (Provider)
+                  ksProviderClass.getConstructor(String.class).newInstance(keystoreProviderArg);
         } else {
           // No-arg Provider constructor
           ksProvider = (Provider) ksProviderClass.getConstructor().newInstance();
@@ -683,8 +728,11 @@ public class ApkSignerTool {
         ks.load(null);
       } else {
         String keystorePasswordSpec =
-            (this.keystorePasswordSpec != null) ? this.keystorePasswordSpec : PasswordRetriever.SPEC_STDIN;
-        keystorePasswords = passwordRetriever.getPasswords(keystorePasswordSpec, "Keystore password for " + name);
+            (this.keystorePasswordSpec != null)
+                ? this.keystorePasswordSpec
+                : PasswordRetriever.SPEC_STDIN;
+        keystorePasswords =
+            passwordRetriever.getPasswords(keystorePasswordSpec, "Keystore password for " + name);
         loadKeyStoreFromFile(ks, keystoreFile, keystorePasswords);
       }
 
@@ -702,10 +750,11 @@ public class ApkSignerTool {
               if (ks.isKeyEntry(entryAlias)) {
                 keyAlias = entryAlias;
                 if (keystoreKeyAlias != null) {
-                  throw new ParameterException(keystoreFile
-                                               + " contains multiple key entries"
-                                               + ". --ks-key-alias option must be used to specify"
-                                               + " which entry to use.");
+                  throw new ParameterException(
+                      keystoreFile
+                          + " contains multiple key entries"
+                          + ". --ks-key-alias option must be used to specify"
+                          + " which entry to use.");
                 }
                 keystoreKeyAlias = keyAlias;
               }
@@ -719,16 +768,17 @@ public class ApkSignerTool {
         // Private key entry alias known. Load that entry's private key.
         keyAlias = keystoreKeyAlias;
         if (!ks.isKeyEntry(keyAlias)) {
-          throw new ParameterException(keystoreFile + " entry \"" + keyAlias + "\" does not contain a key");
+          throw new ParameterException(
+              keystoreFile + " entry \"" + keyAlias + "\" does not contain a key");
         }
 
         Key entryKey;
         if (keyPasswordSpec != null) {
           // Key password spec is explicitly specified. Use this spec to obtain the
           // password and then load the key using that password.
-          List<char[]> keyPasswords = passwordRetriever.getPasswords(keyPasswordSpec,
-              "Key \"" + keyAlias + "\" password for " + name
-          );
+          List<char[]> keyPasswords =
+              passwordRetriever.getPasswords(
+                  keyPasswordSpec, "Key \"" + keyAlias + "\" password for " + name);
           entryKey = getKeyStoreKey(ks, keyAlias, keyPasswords);
         } else {
           // Key password spec is not specified. This means we should assume that key
@@ -738,35 +788,40 @@ public class ApkSignerTool {
           try {
             entryKey = getKeyStoreKey(ks, keyAlias, keystorePasswords);
           } catch (UnrecoverableKeyException expected) {
-            List<char[]> keyPasswords = passwordRetriever.getPasswords(PasswordRetriever.SPEC_STDIN,
-                "Key \"" + keyAlias + "\" password for " + name
-            );
+            List<char[]> keyPasswords =
+                passwordRetriever.getPasswords(
+                    PasswordRetriever.SPEC_STDIN, "Key \"" + keyAlias + "\" password for " + name);
             entryKey = getKeyStoreKey(ks, keyAlias, keyPasswords);
           }
         }
 
         if (entryKey == null) {
-          throw new ParameterException(keystoreFile + " entry \"" + keyAlias + "\" does not contain a key");
+          throw new ParameterException(
+              keystoreFile + " entry \"" + keyAlias + "\" does not contain a key");
         } else if (!(entryKey instanceof PrivateKey)) {
-          throw new ParameterException(keystoreFile
-                                       + " entry \""
-                                       + keyAlias
-                                       + "\" does not contain a private"
-                                       + " key. It contains a key of algorithm: "
-                                       + entryKey.getAlgorithm());
+          throw new ParameterException(
+              keystoreFile
+                  + " entry \""
+                  + keyAlias
+                  + "\" does not contain a private"
+                  + " key. It contains a key of algorithm: "
+                  + entryKey.getAlgorithm());
         }
         key = (PrivateKey) entryKey;
       } catch (UnrecoverableKeyException e) {
-        throw new IOException("Failed to obtain key with alias \""
-                              + keyAlias
-                              + "\" from "
-                              + keystoreFile
-                              + ". Wrong password?", e);
+        throw new IOException(
+            "Failed to obtain key with alias \""
+                + keyAlias
+                + "\" from "
+                + keystoreFile
+                + ". Wrong password?",
+            e);
       }
       this.privateKey = key;
       Certificate[] certChain = ks.getCertificateChain(keyAlias);
       if ((certChain == null) || (certChain.length == 0)) {
-        throw new ParameterException(keystoreFile + " entry \"" + keyAlias + "\" does not contain certificates");
+        throw new ParameterException(
+            keystoreFile + " entry \"" + keyAlias + "\" does not contain certificates");
       }
       this.certs = new ArrayList<>(certChain.length);
       for (Certificate cert : certChain) {
@@ -774,7 +829,8 @@ public class ApkSignerTool {
       }
     }
 
-    private void loadPrivateKeyAndCertsFromFiles(PasswordRetriever passwordRetriver) throws Exception {
+    private void loadPrivateKeyAndCertsFromFiles(PasswordRetriever passwordRetriver)
+        throws Exception {
       if (keyFile == null) {
         throw new ParameterException("Private key file (--key) must be specified");
       }
@@ -786,11 +842,14 @@ public class ApkSignerTool {
       PKCS8EncodedKeySpec keySpec;
       // Potentially encrypted key blob
       try {
-        EncryptedPrivateKeyInfo encryptedPrivateKeyInfo = new EncryptedPrivateKeyInfo(privateKeyBlob);
+        EncryptedPrivateKeyInfo encryptedPrivateKeyInfo =
+            new EncryptedPrivateKeyInfo(privateKeyBlob);
 
         // The blob is indeed an encrypted private key blob
-        String passwordSpec = (keyPasswordSpec != null) ? keyPasswordSpec : PasswordRetriever.SPEC_STDIN;
-        List<char[]> keyPasswords = passwordRetriver.getPasswords(passwordSpec, "Private key password for " + name);
+        String passwordSpec =
+            (keyPasswordSpec != null) ? keyPasswordSpec : PasswordRetriever.SPEC_STDIN;
+        List<char[]> keyPasswords =
+            passwordRetriver.getPasswords(passwordSpec, "Private key password for " + name);
         keySpec = decryptPkcs8EncodedKey(encryptedPrivateKeyInfo, keyPasswords);
       } catch (IOException e) {
         // The blob is not an encrypted private key blob
@@ -799,7 +858,8 @@ public class ApkSignerTool {
           // private key blob
           keySpec = new PKCS8EncodedKeySpec(privateKeyBlob);
         } else {
-          throw new InvalidKeySpecException("Failed to parse encrypted private key blob " + keyFile, e);
+          throw new InvalidKeySpecException(
+              "Failed to parse encrypted private key blob " + keyFile, e);
         }
       }
 
@@ -807,7 +867,8 @@ public class ApkSignerTool {
       try {
         privateKey = loadPkcs8EncodedPrivateKey(keySpec);
       } catch (InvalidKeySpecException e) {
-        throw new InvalidKeySpecException("Failed to load PKCS #8 encoded private key from " + keyFile, e);
+        throw new InvalidKeySpecException(
+            "Failed to load PKCS #8 encoded private key from " + keyFile, e);
       }
 
       // Load certificates
@@ -823,9 +884,7 @@ public class ApkSignerTool {
     }
   }
 
-  /**
-   * Indicates that there is an issue with command-line parameters provided to this tool.
-   */
+  /** Indicates that there is an issue with command-line parameters provided to this tool. */
   private static class ParameterException extends Exception {
     private static final long serialVersionUID = 1L;
 

@@ -30,7 +30,8 @@ public class ExtDataOutput extends DataOutputDelegate {
     }
   }
 
-  public void writeCheckChunkTypeInt(ExtDataInput reader, int expected, int possible) throws IOException {
+  public void writeCheckChunkTypeInt(ExtDataInput reader, int expected, int possible)
+      throws IOException {
     int value = reader.readInt();
     writeInt(value);
     if (value == possible) {

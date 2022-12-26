@@ -1,25 +1,23 @@
 /**
- * Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
- * Copyright 2016 sim sun <sunsj1231@gmail.com>
+ * Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com> Copyright 2016 sim sun
+ * <sunsj1231@gmail.com>
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.tencent.mm.androlib.res.decoder;
 
 import com.tencent.mm.androlib.AndrolibException;
 import com.tencent.mm.util.ExtDataInput;
 import com.tencent.mm.util.ExtDataOutput;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -32,9 +30,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author shwenzhang
- */
+/** @author shwenzhang */
 public class StringBlock {
 
   private static final CharsetDecoder UTF16LE_DECODER = Charset.forName("UTF-16LE").newDecoder();
@@ -54,12 +50,10 @@ public class StringBlock {
   private boolean m_isUTF8;
   private int[] m_stringOwns;
 
-  private StringBlock() {
-  }
+  private StringBlock() {}
 
   /**
-   * Reads whole (including chunk type) string block from stream. Stream must
-   * be at the chunk type.
+   * Reads whole (including chunk type) string block from stream. Stream must be at the chunk type.
    *
    * @param reader reader
    * @return stringblock
@@ -104,7 +98,10 @@ public class StringBlock {
   }
 
   public static int writeSpecNameStringBlock(
-          ExtDataInput reader, ExtDataOutput out, Map<String, Set<String>> specNames, Map<String, Integer> curSpecNameToPos)
+      ExtDataInput reader,
+      ExtDataOutput out,
+      Map<String, Set<String>> specNames,
+      Map<String, Integer> curSpecNameToPos)
       throws IOException, AndrolibException {
     int type = reader.readInt();
     int chunkSize = reader.readInt();
@@ -112,9 +109,10 @@ public class StringBlock {
     int styleOffsetCount = reader.readInt();
 
     if (styleOffsetCount != 0) {
-      throw new AndrolibException(String.format("writeSpecNameStringBlock styleOffsetCount != 0  styleOffsetCount %d",
-          styleOffsetCount
-      ));
+      throw new AndrolibException(
+          String.format(
+              "writeSpecNameStringBlock styleOffsetCount != 0  styleOffsetCount %d",
+              styleOffsetCount));
     }
 
     int flags = reader.readInt();
@@ -158,12 +156,10 @@ public class StringBlock {
         totalSize += 2;
         byte[] tempByte = name.getBytes(Charset.forName("UTF-8"));
         if (name.length() != tempByte.length) {
-          throw new AndrolibException(String.format(
-              "writeSpecNameStringBlock %s UTF-8 length is different name %d, tempByte %d\n",
-              name,
-              name.length(),
-              tempByte.length
-          ));
+          throw new AndrolibException(
+              String.format(
+                  "writeSpecNameStringBlock %s UTF-8 length is different name %d, tempByte %d\n",
+                  name, name.length(), tempByte.length));
         }
         System.arraycopy(tempByte, 0, stringBytes, offset, tempByte.length);
         offset += name.length();
@@ -175,12 +171,10 @@ public class StringBlock {
         totalSize += 2;
         byte[] tempByte = name.getBytes(Charset.forName("UTF-16LE"));
         if ((name.length() * 2) != tempByte.length) {
-          throw new AndrolibException(String.format(
-              "writeSpecNameStringBlock %s UTF-16LE length is different name %d, tempByte %d\n",
-              name,
-              name.length(),
-              tempByte.length
-          ));
+          throw new AndrolibException(
+              String.format(
+                  "writeSpecNameStringBlock %s UTF-16LE length is different name %d, tempByte %d\n",
+                  name, name.length(), tempByte.length));
         }
         System.arraycopy(tempByte, 0, stringBytes, offset, tempByte.length);
         offset += tempByte.length;
@@ -190,7 +184,7 @@ public class StringBlock {
       }
       i++;
     }
-    //要保证string size 是4的倍数,要补零
+    // 要保证string size 是4的倍数,要补零
     size = totalSize - stringsOffset;
     if ((size % 4) != 0) {
       int add = 4 - (size % 4);
@@ -269,11 +263,13 @@ public class StringBlock {
     int i;
     for (i = 0; i < stringCount; i++) {
       stringOffsets[i] = offset;
-      //如果找不到即没混淆这一项,直接拷贝
+      // 如果找不到即没混淆这一项,直接拷贝
       if (tableProguardMap.get(i) == null) {
-        //需要区分是否是最后一项
-        int copyLen = (i == (stringCount - 1)) ? (block.m_strings.length - block.m_stringOffsets[i])
-            : (block.m_stringOffsets[i + 1] - block.m_stringOffsets[i]);
+        // 需要区分是否是最后一项
+        int copyLen =
+            (i == (stringCount - 1))
+                ? (block.m_strings.length - block.m_stringOffsets[i])
+                : (block.m_stringOffsets[i + 1] - block.m_stringOffsets[i]);
         System.arraycopy(block.m_strings, block.m_stringOffsets[i], strings, offset, copyLen);
         offset += copyLen;
         totalSize += copyLen;
@@ -285,11 +281,10 @@ public class StringBlock {
           totalSize += 2;
           byte[] tempByte = name.getBytes(Charset.forName("UTF-8"));
           if (name.length() != tempByte.length) {
-            throw new AndrolibException(String.format(
-                "writeTableNameStringBlock UTF-8 length is different  name %d, tempByte %d\n",
-                name.length(),
-                tempByte.length
-            ));
+            throw new AndrolibException(
+                String.format(
+                    "writeTableNameStringBlock UTF-8 length is different  name %d, tempByte %d\n",
+                    name.length(), tempByte.length));
           }
           System.arraycopy(tempByte, 0, strings, offset, tempByte.length);
           offset += name.length();
@@ -301,11 +296,10 @@ public class StringBlock {
           totalSize += 2;
           byte[] tempByte = name.getBytes(Charset.forName("UTF-16LE"));
           if ((name.length() * 2) != tempByte.length) {
-            throw new AndrolibException(String.format(
-                "writeTableNameStringBlock UTF-16LE length is different  name %d, tempByte %d\n",
-                name.length(),
-                tempByte.length
-            ));
+            throw new AndrolibException(
+                String.format(
+                    "writeTableNameStringBlock UTF-16LE length is different  name %d, tempByte %d\n",
+                    name.length(), tempByte.length));
           }
           System.arraycopy(tempByte, 0, strings, offset, tempByte.length);
           offset += tempByte.length;
@@ -315,7 +309,7 @@ public class StringBlock {
         }
       }
     }
-    //要保证string size 是4的倍数,要补零
+    // 要保证string size 是4的倍数,要补零
     int size = totalSize - stringsOffset;
     if ((size % 4) != 0) {
       int add = 4 - (size % 4);
@@ -324,7 +318,7 @@ public class StringBlock {
         totalSize++;
       }
     }
-    //因为是int的,如果之前的不为0
+    // 因为是int的,如果之前的不为0
     if (stylesOffset != 0) {
       stylesOffset = totalSize;
       totalSize += block.m_styles.length * 4;
@@ -348,8 +342,7 @@ public class StringBlock {
   }
 
   /**
-   * Reads whole (including chunk type) string block from stream. Stream must
-   * be at the chunk type.
+   * Reads whole (including chunk type) string block from stream. Stream must be at the chunk type.
    *
    * @param reader ExtDataInput reader
    * @param out ExtDataOutput out
@@ -381,7 +374,7 @@ public class StringBlock {
     } else {
       length = val;
     }
-    return new int[] { offset, length };
+    return new int[] {offset, length};
   }
 
   private static final int[] getUtf16(byte[] array, int offset) {
@@ -391,9 +384,9 @@ public class StringBlock {
       int high = (array[offset + 3] & 0xFF) << 8;
       int low = (array[offset + 2] & 0xFF);
       int len_value = ((val & 0x7FFF) << 16) + (high + low);
-      return new int[] { 4, len_value * 2 };
+      return new int[] {4, len_value * 2};
     }
-    return new int[] { 2, val * 2 };
+    return new int[] {2, val * 2};
   }
 
   private static final int getShort(byte[] array, int offset) {
@@ -450,8 +443,8 @@ public class StringBlock {
 
   /**
    * Not yet implemented.
-   * <p>
-   * Returns string with style information (if any).
+   *
+   * <p>Returns string with style information (if any).
    *
    * @param index index
    * @return string with style information (if any).
@@ -492,7 +485,9 @@ public class StringBlock {
 
   private String decodeString(int offset, int length) {
     try {
-      return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER).decode(ByteBuffer.wrap(m_strings, offset, length)).toString();
+      return (m_isUTF8 ? UTF8_DECODER : UTF16LE_DECODER)
+          .decode(ByteBuffer.wrap(m_strings, offset, length))
+          .toString();
     } catch (CharacterCodingException ex) {
       LOGGER.log(Level.WARNING, null, ex);
       return null;

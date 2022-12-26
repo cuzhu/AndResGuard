@@ -116,8 +116,8 @@ class PasswordRetriever implements AutoCloseable {
   }
 
   /**
-   * Adds the provided password to the provided list. Does nothing if the password is already in
-   * the list.
+   * Adds the provided password to the provided list. Does nothing if the password is already in the
+   * list.
    */
   private static void addPassword(List<char[]> passwords, char[] password) {
     for (char[] existingPassword : passwords) {
@@ -129,16 +129,23 @@ class PasswordRetriever implements AutoCloseable {
   }
 
   private static byte[] encodePassword(char[] pwd, Charset cs) throws IOException {
-    ByteBuffer pwdBytes = cs.newEncoder().onMalformedInput(CodingErrorAction.REPLACE).onUnmappableCharacter(
-        CodingErrorAction.REPLACE).encode(CharBuffer.wrap(pwd));
+    ByteBuffer pwdBytes =
+        cs.newEncoder()
+            .onMalformedInput(CodingErrorAction.REPLACE)
+            .onUnmappableCharacter(CodingErrorAction.REPLACE)
+            .encode(CharBuffer.wrap(pwd));
     byte[] encoded = new byte[pwdBytes.remaining()];
     pwdBytes.get(encoded);
     return encoded;
   }
 
   private static char[] decodePassword(byte[] pwdBytes, Charset encoding) throws IOException {
-    CharBuffer pwdChars = encoding.newDecoder().onMalformedInput(CodingErrorAction.REPLACE).onUnmappableCharacter(
-        CodingErrorAction.REPLACE).decode(ByteBuffer.wrap(pwdBytes));
+    CharBuffer pwdChars =
+        encoding
+            .newDecoder()
+            .onMalformedInput(CodingErrorAction.REPLACE)
+            .onUnmappableCharacter(CodingErrorAction.REPLACE)
+            .decode(ByteBuffer.wrap(pwdBytes));
     char[] result = new char[pwdChars.remaining()];
     pwdChars.get(result);
     return result;
@@ -160,9 +167,7 @@ class PasswordRetriever implements AutoCloseable {
     return chars;
   }
 
-  /**
-   * Returns the character encoding used by the console.
-   */
+  /** Returns the character encoding used by the console. */
   private static Charset getConsoleEncoding() {
     // IMPLEMENTATION NOTE: There is no public API for obtaining the console's character
     // encoding. We thus cheat by using implementation details of the most popular JVMs.
@@ -176,7 +181,8 @@ class PasswordRetriever implements AutoCloseable {
       }
     } catch (ReflectiveOperationException e) {
       Charset defaultCharset = Charset.defaultCharset();
-      System.err.println("warning: Failed to obtain console character encoding name. Assuming " + defaultCharset);
+      System.err.println(
+          "warning: Failed to obtain console character encoding name. Assuming " + defaultCharset);
       return defaultCharset;
     }
 
@@ -189,11 +195,12 @@ class PasswordRetriever implements AutoCloseable {
         return StandardCharsets.UTF_8;
       }
       Charset defaultCharset = Charset.defaultCharset();
-      System.err.println("warning: Console uses unknown character encoding: "
-                         + consoleCharsetName
-                         + ". Using "
-                         + defaultCharset
-                         + " instead");
+      System.err.println(
+          "warning: Console uses unknown character encoding: "
+              + consoleCharsetName
+              + ". Using "
+              + defaultCharset
+              + " instead");
       return defaultCharset;
     }
   }
@@ -222,21 +229,22 @@ class PasswordRetriever implements AutoCloseable {
 
   /**
    * Returns the passwords described by the provided spec. The reason there may be more than one
-   * password is compatibility with {@code keytool} and {@code jarsigner} which in certain cases
-   * use the form of passwords encoded using the console's character encoding.
+   * password is compatibility with {@code keytool} and {@code jarsigner} which in certain cases use
+   * the form of passwords encoded using the console's character encoding.
    *
    * <p>Supported specs:
+   *
    * <ul>
-   * <li><em>stdin</em> -- read password as a line from console, if available, or standard
-   * input if console is not available</li>
-   * <li><em>pass:password</em> -- password specified inside the spec, starting after
-   * {@code pass:}</li>
-   * <li><em>file:path</em> -- read password as a line from the specified file</li>
-   * <li><em>env:name</em> -- password is in the specified environment variable</li>
+   *   <li><em>stdin</em> -- read password as a line from console, if available, or standard input
+   *       if console is not available
+   *   <li><em>pass:password</em> -- password specified inside the spec, starting after {@code
+   *       pass:}
+   *   <li><em>file:path</em> -- read password as a line from the specified file
+   *   <li><em>env:name</em> -- password is in the specified environment variable
    * </ul>
    *
-   * <p>When the same file (including standard input) is used for providing multiple passwords,
-   * the passwords are read from the file one line at a time.
+   * <p>When the same file (including standard input) is used for providing multiple passwords, the
+   * passwords are read from the file one line at a time.
    */
   public List<char[]> getPasswords(String spec, String description) throws IOException {
     // IMPLEMENTATION NOTE: Java KeyStore and PBEKeySpec APIs take passwords as arrays of
@@ -310,7 +318,8 @@ class PasswordRetriever implements AutoCloseable {
       }
       byte[] encodedPwd = readEncodedPassword(in);
       if (encodedPwd.length == 0) {
-        throw new IOException("Failed to read " + description + " : end of file reached in " + file);
+        throw new IOException(
+            "Failed to read " + description + " : end of file reached in " + file);
       }
       // By default, textual input from files is supposed to be treated as encoded using JVM's
       // default character encoding.
@@ -319,7 +328,8 @@ class PasswordRetriever implements AutoCloseable {
       String name = spec.substring("env:".length());
       String value = System.getenv(name);
       if (value == null) {
-        throw new IOException("Failed to read " + description + ": environment variable " + value + " not specified");
+        throw new IOException(
+            "Failed to read " + description + ": environment variable " + value + " not specified");
       }
       return getPasswords(value.toCharArray());
     } else {

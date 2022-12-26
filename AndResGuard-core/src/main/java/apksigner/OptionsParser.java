@@ -22,11 +22,12 @@ import java.util.Arrays;
  * Parser of command-line options/switches/flags.
  *
  * <p>Supported option formats:
+ *
  * <ul>
- * <li>{@code --name value}</li>
- * <li>{@code --name=value}</li>
- * <li>{@code -name value}</li>
- * <li>{@code --name} (boolean options only)</li>
+ *   <li>{@code --name value}
+ *   <li>{@code --name=value}
+ *   <li>{@code -name value}
+ *   <li>{@code --name} (boolean options only)
  * </ul>
  *
  * <p>To use the parser, create an instance, providing it with the command-line parameters, then
@@ -38,9 +39,7 @@ class OptionsParser {
   private String mLastOptionValue;
   private String mLastOptionOriginalForm;
 
-  /**
-   * Constructs a new {@code OptionsParser} initialized with the provided command-line.
-   */
+  /** Constructs a new {@code OptionsParser} initialized with the provided command-line. */
   public OptionsParser(String[] params) {
     mParams = params.clone();
   }
@@ -49,8 +48,8 @@ class OptionsParser {
    * Returns the name (without leading dashes) of the next option (starting with the very first
    * option) or {@code null} if there are no options left.
    *
-   * <p>The value of this option can be obtained via {@link #getRequiredValue(String)},
-   * {@link #getRequiredIntValue(String)}, and {@link #getOptionalBooleanValue(boolean)}.
+   * <p>The value of this option can be obtained via {@link #getRequiredValue(String)}, {@link
+   * #getRequiredIntValue(String)}, and {@link #getOptionalBooleanValue(boolean)}.
    */
   public String nextOption() {
     if (mIndex >= mParams.length) {
@@ -87,16 +86,14 @@ class OptionsParser {
   }
 
   /**
-   * Returns the original form of the current option. The original form includes the leading dash
-   * or dashes. This is intended to be used for referencing the option in error messages.
+   * Returns the original form of the current option. The original form includes the leading dash or
+   * dashes. This is intended to be used for referencing the option in error messages.
    */
   public String getOptionOriginalForm() {
     return mLastOptionOriginalForm;
   }
 
-  /**
-   * Returns the value of the current option, throwing an exception if the value is missing.
-   */
+  /** Returns the value of the current option, throwing an exception if the value is missing. */
   public String getRequiredValue(String valueDescription) throws OptionsException {
     if (mLastOptionValue != null) {
       String result = mLastOptionValue;
@@ -117,19 +114,20 @@ class OptionsParser {
   }
 
   /**
-   * Returns the value of the current numeric option, throwing an exception if the value is
-   * missing or is not numeric.
+   * Returns the value of the current numeric option, throwing an exception if the value is missing
+   * or is not numeric.
    */
   public int getRequiredIntValue(String valueDescription) throws OptionsException {
     String value = getRequiredValue(valueDescription);
     try {
       return Integer.parseInt(value);
     } catch (NumberFormatException e) {
-      throw new OptionsException(valueDescription
-                                 + " ("
-                                 + mLastOptionOriginalForm
-                                 + ") must be a decimal number: "
-                                 + value);
+      throw new OptionsException(
+          valueDescription
+              + " ("
+              + mLastOptionOriginalForm
+              + ") must be a decimal number: "
+              + value);
     }
   }
 
@@ -147,11 +145,12 @@ class OptionsParser {
       } else if ("false".equals(stringValue)) {
         return false;
       }
-      throw new OptionsException("Unsupported value for "
-                                 + mLastOptionOriginalForm
-                                 + ": "
-                                 + stringValue
-                                 + ". Only true or false supported.");
+      throw new OptionsException(
+          "Unsupported value for "
+              + mLastOptionOriginalForm
+              + ": "
+              + stringValue
+              + ". Only true or false supported.");
     }
 
     // --option (true|false) form OR just --option
@@ -172,8 +171,8 @@ class OptionsParser {
   }
 
   /**
-   * Returns the remaining command-line parameters. This is intended to be invoked once
-   * {@link #nextOption()} returns {@code null}.
+   * Returns the remaining command-line parameters. This is intended to be invoked once {@link
+   * #nextOption()} returns {@code null}.
    */
   public String[] getRemainingParams() {
     if (mIndex >= mParams.length) {
@@ -188,9 +187,7 @@ class OptionsParser {
     }
   }
 
-  /**
-   * Indicates that an error was encountered while parsing command-line options.
-   */
+  /** Indicates that an error was encountered while parsing command-line options. */
   public static class OptionsException extends Exception {
     private static final long serialVersionUID = 1L;
 

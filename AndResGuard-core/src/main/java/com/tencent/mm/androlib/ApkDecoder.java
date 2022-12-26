@@ -9,6 +9,7 @@ import com.tencent.mm.resourceproguard.Configuration;
 import com.tencent.mm.util.FileOperation;
 import com.tencent.mm.util.TypedValue;
 import com.tencent.mm.util.Utils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -22,9 +23,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-/**
- * @author shwenzhang
- */
+/** @author shwenzhang */
 public class ApkDecoder {
 
   final HashSet<Path> mRawResourceFiles = new HashSet<>();
@@ -84,47 +83,58 @@ public class ApkDecoder {
     System.out.printf("unziping apk to %s\n", unZipDest);
     mCompressData = FileOperation.unZipAPk(apkFile.getAbsoluteFile().getAbsolutePath(), unZipDest);
     dealWithCompressConfig();
-    //将res混淆成r
+    // 将res混淆成r
     if (!config.mKeepRoot) {
       mOutResFile = new File(mOutDir.getAbsolutePath() + File.separator + TypedValue.RES_FILE_PATH);
     } else {
       mOutResFile = new File(mOutDir.getAbsolutePath() + File.separator + "res");
     }
 
-    //这个需要混淆各个文件夹
-    mRawResFile = new File(mOutDir.getAbsoluteFile().getAbsolutePath()
-                           + File.separator
-                           + TypedValue.UNZIP_FILE_PATH
-                           + File.separator
-                           + "res");
-    mOutTempDir = new File(mOutDir.getAbsoluteFile().getAbsolutePath() + File.separator + TypedValue.UNZIP_FILE_PATH);
+    // 这个需要混淆各个文件夹
+    mRawResFile =
+        new File(
+            mOutDir.getAbsoluteFile().getAbsolutePath()
+                + File.separator
+                + TypedValue.UNZIP_FILE_PATH
+                + File.separator
+                + "res");
+    mOutTempDir =
+        new File(
+            mOutDir.getAbsoluteFile().getAbsolutePath()
+                + File.separator
+                + TypedValue.UNZIP_FILE_PATH);
 
-    //这里纪录原始res目录的文件
+    // 这里纪录原始res目录的文件
     Files.walkFileTree(mRawResFile.toPath(), new ResourceFilesVisitor());
 
     if (!mRawResFile.exists() || !mRawResFile.isDirectory()) {
       throw new IOException("can not found res dir in the apk or it is not a dir");
     }
 
-    mOutTempARSCFile = new File(mOutDir.getAbsoluteFile().getAbsolutePath() + File.separator + "resources_temp.arsc");
-    mOutARSCFile = new File(mOutDir.getAbsoluteFile().getAbsolutePath() + File.separator + "resources.arsc");
+    mOutTempARSCFile =
+        new File(
+            mOutDir.getAbsoluteFile().getAbsolutePath() + File.separator + "resources_temp.arsc");
+    mOutARSCFile =
+        new File(mOutDir.getAbsoluteFile().getAbsolutePath() + File.separator + "resources.arsc");
 
     String basename = apkFile.getName().substring(0, apkFile.getName().indexOf(".apk"));
-    mResMappingFile = new File(mOutDir.getAbsoluteFile().getAbsolutePath()
-                               + File.separator
-                               + TypedValue.RES_MAPPING_FILE
-                               + basename
-                               + TypedValue.TXT_FILE);
-    mMergeDuplicatedResMappingFile = new File(mOutDir.getAbsoluteFile().getAbsolutePath()
-                             + File.separator
-                             + TypedValue.MERGE_DUPLICATED_RES_MAPPING_FILE
-                             + basename
-                             + TypedValue.TXT_FILE);
+    mResMappingFile =
+        new File(
+            mOutDir.getAbsoluteFile().getAbsolutePath()
+                + File.separator
+                + TypedValue.RES_MAPPING_FILE
+                + basename
+                + TypedValue.TXT_FILE);
+    mMergeDuplicatedResMappingFile =
+        new File(
+            mOutDir.getAbsoluteFile().getAbsolutePath()
+                + File.separator
+                + TypedValue.MERGE_DUPLICATED_RES_MAPPING_FILE
+                + basename
+                + TypedValue.TXT_FILE);
   }
 
-  /**
-   * 根据config来修改压缩的值
-   */
+  /** 根据config来修改压缩的值 */
   private void dealWithCompressConfig() {
     if (config.mUseCompress) {
       HashSet<Pattern> patterns = config.mCompressPatterns;
@@ -189,9 +199,10 @@ public class ApkDecoder {
       // this will determine whether we compress on rebuild or not.
       System.out.printf("decoding resources.arsc\n");
       RawARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"));
-      ResPackage[] pkgs = ARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"), this);
+      ResPackage[] pkgs =
+          ARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"), this);
 
-      //把没有纪录在resources.arsc的资源文件也拷进dest目录
+      // 把没有纪录在resources.arsc的资源文件也拷进dest目录
       copyOtherResFiles();
 
       ARSCDecoder.write(apkFile.getDirectory().getFileInput("resources.arsc"), this, pkgs);

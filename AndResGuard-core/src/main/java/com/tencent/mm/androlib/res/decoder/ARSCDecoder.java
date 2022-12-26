@@ -1,20 +1,17 @@
 /**
- * Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
- * Copyright 2016 sim sun <sunsj1231@gmail.com>
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com> Copyright 2016 sim sun
+ * <sunsj1231@gmail.com>
+ *
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
+ *
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.tencent.mm.androlib.res.decoder;
 
 import com.mindprod.ledatastream.LEDataInputStream;
@@ -58,9 +55,9 @@ import java.util.regex.Pattern;
 
 public class ARSCDecoder {
 
-  private final static boolean DEBUG = false;
+  private static final boolean DEBUG = false;
 
-  private final static short ENTRY_FLAG_COMPLEX = 0x0001;
+  private static final short ENTRY_FLAG_COMPLEX = 0x0001;
   private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
   private static final int KNOWN_CONFIG_BYTES = 56;
 
@@ -90,9 +87,10 @@ public class ARSCDecoder {
   private boolean mShouldResguardForType = false;
   private Writer mMappingWriter;
   private Writer mMergeDuplicatedResMappingWriter;
-  private Map<Long,List<MergeDuplicatedResInfo>> mMergeDuplicatedResInfoData = new HashMap<>();
+  private Map<Long, List<MergeDuplicatedResInfo>> mMergeDuplicatedResInfoData = new HashMap<>();
 
-  private ARSCDecoder(InputStream arscStream, ApkDecoder decoder) throws AndrolibException, IOException {
+  private ARSCDecoder(InputStream arscStream, ApkDecoder decoder)
+      throws AndrolibException, IOException {
     mOldFileName = new LinkedHashMap<>();
     mCurSpecNameToPos = new LinkedHashMap<>();
     mShouldResguardTypeSet = new HashSet<>();
@@ -101,18 +99,22 @@ public class ARSCDecoder {
     proguardFileName();
   }
 
-  private ARSCDecoder(InputStream arscStream, ApkDecoder decoder, ResPackage[] pkgs) throws FileNotFoundException {
+  private ARSCDecoder(InputStream arscStream, ApkDecoder decoder, ResPackage[] pkgs)
+      throws FileNotFoundException {
     mOldFileName = new LinkedHashMap<>();
     mCurSpecNameToPos = new LinkedHashMap<>();
     mShouldResguardTypeSet = new HashSet<>();
     mApkDecoder = decoder;
     mIn = new ExtDataInput(new LEDataInputStream(arscStream));
-    mOut = new ExtDataOutput(new LEDataOutputStream(new FileOutputStream(mApkDecoder.getOutTempARSCFile(), false)));
+    mOut =
+        new ExtDataOutput(
+            new LEDataOutputStream(new FileOutputStream(mApkDecoder.getOutTempARSCFile(), false)));
     mPkgs = pkgs;
     mPkgsLenghtChange = new int[pkgs.length];
   }
 
-  public static ResPackage[] decode(InputStream arscStream, ApkDecoder apkDecoder) throws AndrolibException {
+  public static ResPackage[] decode(InputStream arscStream, ApkDecoder apkDecoder)
+      throws AndrolibException {
     try {
       ARSCDecoder decoder = new ARSCDecoder(arscStream, apkDecoder);
       ResPackage[] pkgs = decoder.readTable();
@@ -122,7 +124,8 @@ public class ARSCDecoder {
     }
   }
 
-  public static void write(InputStream arscStream, ApkDecoder decoder, ResPackage[] pkgs) throws AndrolibException {
+  public static void write(InputStream arscStream, ApkDecoder decoder, ResPackage[] pkgs)
+      throws AndrolibException {
     try {
       ARSCDecoder writer = new ARSCDecoder(arscStream, decoder, pkgs);
       writer.writeTable();
@@ -133,7 +136,8 @@ public class ARSCDecoder {
 
   private void proguardFileName() throws IOException, AndrolibException {
     mMappingWriter = new BufferedWriter(new FileWriter(mApkDecoder.getResMappingFile(), false));
-    mMergeDuplicatedResMappingWriter = new BufferedWriter(new FileWriter(mApkDecoder.getMergeDuplicatedResMappingFile(), false));
+    mMergeDuplicatedResMappingWriter =
+        new BufferedWriter(new FileWriter(mApkDecoder.getMergeDuplicatedResMappingFile(), false));
     mMergeDuplicatedResMappingWriter.write("res filter path mapping:\n");
     mMergeDuplicatedResMappingWriter.flush();
 
@@ -165,7 +169,9 @@ public class ARSCDecoder {
         for (String name : fileMapping.values()) {
           int dot = name.indexOf("/");
           if (dot == -1) {
-            throw new IOException(String.format("the old mapping res file path should be like r/a, yours %s\n", name));
+            throw new IOException(
+                String.format(
+                    "the old mapping res file path should be like r/a, yours %s\n", name));
           }
           resRoot = name.substring(0, dot);
           keepFileNames.add(name.substring(dot + 1));
@@ -184,9 +190,9 @@ public class ARSCDecoder {
       } else {
         for (int i = 0; i < resFiles.length; i++) {
           // 这里也要用linux的分隔符,如果普通的话，就是r
-          mOldFileName.put("res" + "/" + resFiles[i].getName(),
-             TypedValue.RES_FILE_PATH + "/" + mResguardBuilder.getReplaceString()
-          );
+          mOldFileName.put(
+              "res" + "/" + resFiles[i].getName(),
+              TypedValue.RES_FILE_PATH + "/" + mResguardBuilder.getReplaceString());
         }
       }
       generalFileResMapping();
@@ -205,10 +211,13 @@ public class ARSCDecoder {
       packages[i] = readPackage();
     }
     mMappingWriter.close();
-    System.out.printf("resources mapping file %s done\n", mApkDecoder.getResMappingFile().getAbsolutePath());
+    System.out.printf(
+        "resources mapping file %s done\n", mApkDecoder.getResMappingFile().getAbsolutePath());
     generalFilterEnd(mMergeDuplicatedResCount, mMergeDuplicatedResTotalSize);
     mMergeDuplicatedResMappingWriter.close();
-    System.out.printf("resources filter mapping file %s done\n", mApkDecoder.getMergeDuplicatedResMappingFile().getAbsolutePath());
+    System.out.printf(
+        "resources filter mapping file %s done\n",
+        mApkDecoder.getMergeDuplicatedResMappingFile().getAbsolutePath());
     return packages;
   }
 
@@ -222,10 +231,10 @@ public class ARSCDecoder {
     mTableLenghtChange += StringBlock.writeTableNameStringBlock(mIn, mOut, mTableStringsResguard);
     writeNextChunk(0);
     if (packageCount != mPkgs.length) {
-      throw new AndrolibException(String.format("writeTable package count is different before %d, now %d",
-         mPkgs.length,
-         packageCount
-      ));
+      throw new AndrolibException(
+          String.format(
+              "writeTable package count is different before %d, now %d",
+              mPkgs.length, packageCount));
     }
     for (int i = 0; i < packageCount; i++) {
       mCurPackageID = i;
@@ -247,44 +256,46 @@ public class ARSCDecoder {
   }
 
   private void generalResIDMapping(
-     String packageName, String typename, String specName, String replace) throws IOException {
-    mMappingWriter.write("    "
-       + packageName
-       + ".R."
-       + typename
-       + "."
-       + specName
-       + " -> "
-       + packageName
-       + ".R."
-       + typename
-       + "."
-       + replace);
+      String packageName, String typename, String specName, String replace) throws IOException {
+    mMappingWriter.write(
+        "    "
+            + packageName
+            + ".R."
+            + typename
+            + "."
+            + specName
+            + " -> "
+            + packageName
+            + ".R."
+            + typename
+            + "."
+            + replace);
     mMappingWriter.write("\n");
     mMappingWriter.flush();
   }
 
   private void generalFilterResIDMapping(
-     String originalFile, String original, String replaceFile, String replace, long fileLen) throws IOException {
-    mMergeDuplicatedResMappingWriter.write("    "
-       + originalFile
-       + " : "
-       + original
-       + " -> "
-       + replaceFile
-       + " : "
-       + replace
-       + " (size:"
-       + getNetFileSizeDescription(fileLen)
-       + ")");
+      String originalFile, String original, String replaceFile, String replace, long fileLen)
+      throws IOException {
+    mMergeDuplicatedResMappingWriter.write(
+        "    "
+            + originalFile
+            + " : "
+            + original
+            + " -> "
+            + replaceFile
+            + " : "
+            + replace
+            + " (size:"
+            + getNetFileSizeDescription(fileLen)
+            + ")");
     mMergeDuplicatedResMappingWriter.write("\n");
     mMergeDuplicatedResMappingWriter.flush();
   }
 
   private void generalFilterEnd(int count, long totalSize) throws IOException {
     mMergeDuplicatedResMappingWriter.write(
-       "removed: count(" + count
-          + "), totalSize(" + getNetFileSizeDescription(totalSize) + ")");
+        "removed: count(" + count + "), totalSize(" + getNetFileSizeDescription(totalSize) + ")");
     mMergeDuplicatedResMappingWriter.flush();
   }
 
@@ -312,8 +323,12 @@ public class ARSCDecoder {
 
   private void reWriteTable() throws AndrolibException, IOException {
 
-    mIn = new ExtDataInput(new LEDataInputStream(new FileInputStream(mApkDecoder.getOutTempARSCFile())));
-    mOut = new ExtDataOutput(new LEDataOutputStream(new FileOutputStream(mApkDecoder.getOutARSCFile(), false)));
+    mIn =
+        new ExtDataInput(
+            new LEDataInputStream(new FileInputStream(mApkDecoder.getOutTempARSCFile())));
+    mOut =
+        new ExtDataOutput(
+            new LEDataOutputStream(new FileOutputStream(mApkDecoder.getOutARSCFile(), false)));
     writeNextChunkCheck(Header.TYPE_TABLE, mTableLenghtChange);
     int packageCount = mIn.readInt();
     mOut.writeInt(packageCount);
@@ -368,7 +383,7 @@ public class ARSCDecoder {
     int id = (byte) mIn.readInt();
     mOut.writeInt(id);
     mResId = id << 24;
-    //char_16的，一共256byte
+    // char_16的，一共256byte
     mOut.writeBytes(mIn, 256);
     /* typeNameStrings */
     mOut.writeInt(mIn.readInt());
@@ -381,11 +396,9 @@ public class ARSCDecoder {
     StringBlock.writeAll(mIn, mOut);
 
     if (mPkgs[mCurPackageID].isCanResguard()) {
-      int specSizeChange = StringBlock.writeSpecNameStringBlock(mIn,
-         mOut,
-         mPkgs[mCurPackageID].getSpecNamesBlock(),
-         mCurSpecNameToPos
-      );
+      int specSizeChange =
+          StringBlock.writeSpecNameStringBlock(
+              mIn, mOut, mPkgs[mCurPackageID].getSpecNamesBlock(), mCurSpecNameToPos);
       mPkgsLenghtChange[mCurPackageID] += specSizeChange;
       mTableLenghtChange += specSizeChange;
     } else {
@@ -400,14 +413,13 @@ public class ARSCDecoder {
     }
   }
 
-  /**
-   * 如果是保持mapping的话，需要去掉某部分已经用过的mapping
-   */
+  /** 如果是保持mapping的话，需要去掉某部分已经用过的mapping */
   private void reduceFromOldMappingFile() {
     if (mPkg.isCanResguard()) {
       if (mApkDecoder.getConfig().mUseKeepMapping) {
         // 判断是否走keepmapping
-        HashMap<String, HashMap<String, HashMap<String, String>>> resMapping = mApkDecoder.getConfig().mOldResMapping;
+        HashMap<String, HashMap<String, HashMap<String, String>>> resMapping =
+            mApkDecoder.getConfig().mOldResMapping;
         String packName = mPkg.getName();
         if (resMapping.containsKey(packName)) {
           HashMap<String, HashMap<String, String>> typeMaps = resMapping.get(packName);
@@ -427,7 +439,8 @@ public class ARSCDecoder {
     final String packName = mPkg.getName();
     if (mApkDecoder.getConfig().mWhiteList.containsKey(packName)) {
       if (mApkDecoder.getConfig().mUseWhiteList) {
-        HashMap<String, HashSet<Pattern>> typeMaps = mApkDecoder.getConfig().mWhiteList.get(packName);
+        HashMap<String, HashSet<Pattern>> typeMaps =
+            mApkDecoder.getConfig().mWhiteList.get(packName);
         return typeMaps.get(resType);
       }
     }
@@ -493,7 +506,7 @@ public class ARSCDecoder {
     int libraryCount = mIn.readInt();
     mOut.writeInt(libraryCount);
     for (int i = 0; i < libraryCount; i++) {
-      mOut.writeInt(mIn.readInt());/*packageId*/
+      mOut.writeInt(mIn.readInt()); /*packageId*/
       mOut.writeBytes(mIn, 256); /*packageName*/
     }
     writeNextChunk(0);
@@ -511,7 +524,7 @@ public class ARSCDecoder {
     int entryCount = mIn.readInt();
     mOut.writeInt(entryCount);
     // 对，这里是用来描述差异性的！！！
-    ///* flags */mIn.skipBytes(entryCount * 4);
+    /// * flags */mIn.skipBytes(entryCount * 4);
     int[] entryOffsets = mIn.readIntArray(entryCount);
     mOut.writeIntArray(entryOffsets);
 
@@ -566,7 +579,8 @@ public class ARSCDecoder {
 
     if (mPkg.isCanResguard()) {
       // 混淆过或者已经添加到白名单的都不需要再处理了
-      if (!mResguardBuilder.isReplaced(mCurEntryID) && !mResguardBuilder.isInWhiteList(mCurEntryID)) {
+      if (!mResguardBuilder.isReplaced(mCurEntryID)
+          && !mResguardBuilder.isInWhiteList(mCurEntryID)) {
         Configuration config = mApkDecoder.getConfig();
         boolean isWhiteList = false;
         if (config.mUseWhiteList) {
@@ -590,10 +604,11 @@ public class ARSCDecoder {
    * deal with whitelist
    *
    * @param specNamesId resource spec name id
-   * @param config      {@Configuration} AndResGuard configuration
+   * @param config {@Configuration} AndResGuard configuration
    * @return isWhiteList whether this resource is processed by whitelist
    */
-  private boolean dealWithWhiteList(int specNamesId, Configuration config) throws AndrolibException {
+  private boolean dealWithWhiteList(int specNamesId, Configuration config)
+      throws AndrolibException {
     String packName = mPkg.getName();
     if (config.mWhiteList.containsKey(packName)) {
       HashMap<String, HashSet<Pattern>> typeMaps = config.mWhiteList.get(packName);
@@ -605,7 +620,9 @@ public class ARSCDecoder {
           Pattern p = it.next();
           if (p.matcher(specName).matches()) {
             if (DEBUG) {
-              System.out.printf("[match] matcher %s ,typeName %s, specName :%s\n", p.pattern(), typeName, specName);
+              System.out.printf(
+                  "[match] matcher %s ,typeName %s, specName :%s\n",
+                  p.pattern(), typeName, specName);
             }
             mPkg.putSpecNamesReplace(mResId, specName);
             mPkg.putSpecNamesblock(specName, specName);
@@ -620,7 +637,8 @@ public class ARSCDecoder {
     return false;
   }
 
-  private void dealWithNonWhiteList(int specNamesId, Configuration config) throws AndrolibException, IOException {
+  private void dealWithNonWhiteList(int specNamesId, Configuration config)
+      throws AndrolibException, IOException {
     String replaceString = null;
     boolean keepMapping = false;
     if (config.mUseKeepMapping) {
@@ -647,7 +665,8 @@ public class ARSCDecoder {
     if (replaceString == null) {
       throw new AndrolibException("readEntry replaceString == null");
     }
-    generalResIDMapping(mPkg.getName(), mType.getName(), mSpecNames.get(specNamesId).toString(), replaceString);
+    generalResIDMapping(
+        mPkg.getName(), mType.getName(), mSpecNames.get(specNamesId).toString(), replaceString);
     mPkg.putSpecNamesReplace(mResId, replaceString);
     // arsc name列混淆成固定名字, 减少string pool大小
     boolean useFixedName = config.mFixedResName != null && config.mFixedResName.length() > 0;
@@ -666,7 +685,8 @@ public class ARSCDecoder {
     if (pkg.isCanResguard()) {
       specNamesId = mCurSpecNameToPos.get(pkg.getSpecRepplace(mResId));
       if (specNamesId < 0) {
-        throw new AndrolibException(String.format("writeEntry new specNamesId < 0 %d", specNamesId));
+        throw new AndrolibException(
+            String.format("writeEntry new specNamesId < 0 %d", specNamesId));
       }
     }
     mOut.writeInt(specNamesId);
@@ -678,10 +698,9 @@ public class ARSCDecoder {
     }
   }
 
-  /**
-   * @param flags whether read direct
-   */
-  private void readComplexEntry(boolean flags, int specNamesId) throws IOException, AndrolibException {
+  /** @param flags whether read direct */
+  private void readComplexEntry(boolean flags, int specNamesId)
+      throws IOException, AndrolibException {
     int parent = mIn.readInt();
     int count = mIn.readInt();
     for (int i = 0; i < count; i++) {
@@ -700,9 +719,7 @@ public class ARSCDecoder {
     }
   }
 
-  /**
-   * @param flags whether read direct
-   */
+  /** @param flags whether read direct */
   private void readValue(boolean flags, int specNamesId) throws IOException, AndrolibException {
     /* size */
     mIn.skipCheckShort((short) 8);
@@ -711,21 +728,22 @@ public class ARSCDecoder {
     byte type = mIn.readByte();
     int data = mIn.readInt();
 
-    //这里面有几个限制，一对于string ,id, array我们是知道肯定不用改的，第二看要那个type是否对应有文件路径
+    // 这里面有几个限制，一对于string ,id, array我们是知道肯定不用改的，第二看要那个type是否对应有文件路径
     if (mPkg.isCanResguard()
-       && flags
-       && type == TypedValue.TYPE_STRING
-       && mShouldResguardForType
-       && mShouldResguardTypeSet.contains(mType.getName())) {
+        && flags
+        && type == TypedValue.TYPE_STRING
+        && mShouldResguardForType
+        && mShouldResguardTypeSet.contains(mType.getName())) {
       if (mTableStringsResguard.get(data) == null) {
         String raw = mTableStrings.get(data).toString();
         if (StringUtil.isBlank(raw) || raw.equalsIgnoreCase("null")) return;
 
         String proguard = mPkg.getSpecRepplace(mResId);
-        //这个要写死这个，因为resources.arsc里面就是用这个
+        // 这个要写死这个，因为resources.arsc里面就是用这个
         int secondSlash = raw.lastIndexOf("/");
         if (secondSlash == -1) {
-          throw new AndrolibException(String.format("can not find \\ or raw string in res path = %s", raw));
+          throw new AndrolibException(
+              String.format("can not find \\ or raw string in res path = %s", raw));
         }
 
         String newFilePath = raw.substring(0, secondSlash);
@@ -737,7 +755,7 @@ public class ARSCDecoder {
           System.err.printf("can not found new res path, raw=%s\n", raw);
           return;
         }
-        //同理这里不能用File.separator，因为resources.arsc里面就是用这个
+        // 同理这里不能用File.separator，因为resources.arsc里面就是用这个
         String result = newFilePath + "/" + proguard;
         int firstDot = raw.indexOf(".");
         if (firstDot != -1) {
@@ -746,14 +764,18 @@ public class ARSCDecoder {
         String compatibaleraw = new String(raw);
         String compatibaleresult = new String(result);
 
-        //为了适配window要做一次转换
+        // 为了适配window要做一次转换
         if (!File.separator.contains("/")) {
           compatibaleresult = compatibaleresult.replace("/", File.separator);
           compatibaleraw = compatibaleraw.replace("/", File.separator);
         }
 
-        File resRawFile = new File(mApkDecoder.getOutTempDir().getAbsolutePath() + File.separator + compatibaleraw);
-        File resDestFile = new File(mApkDecoder.getOutDir().getAbsolutePath() + File.separator + compatibaleresult);
+        File resRawFile =
+            new File(
+                mApkDecoder.getOutTempDir().getAbsolutePath() + File.separator + compatibaleraw);
+        File resDestFile =
+            new File(
+                mApkDecoder.getOutDir().getAbsolutePath() + File.separator + compatibaleresult);
 
         MergeDuplicatedResInfo filterInfo = null;
         boolean mergeDuplicatedRes = mApkDecoder.getConfig().mMergeDuplicatedRes;
@@ -765,7 +787,7 @@ public class ARSCDecoder {
           }
         }
 
-        //这里用的是linux的分隔符
+        // 这里用的是linux的分隔符
         HashMap<String, Integer> compressData = mApkDecoder.getCompressData();
         if (compressData.containsKey(raw)) {
           compressData.put(result, compressData.get(raw));
@@ -774,17 +796,19 @@ public class ARSCDecoder {
         }
 
         if (!resRawFile.exists()) {
-          System.err.printf("can not find res file, you delete it? path: resFile=%s\n", resRawFile.getAbsolutePath());
+          System.err.printf(
+              "can not find res file, you delete it? path: resFile=%s\n",
+              resRawFile.getAbsolutePath());
         } else {
           if (!mergeDuplicatedRes && resDestFile.exists()) {
-            throw new AndrolibException(String.format("res dest file is already  found: destFile=%s",
-               resDestFile.getAbsolutePath()
-            ));
+            throw new AndrolibException(
+                String.format(
+                    "res dest file is already  found: destFile=%s", resDestFile.getAbsolutePath()));
           }
           if (filterInfo == null) {
             FileOperation.copyFileUsingStream(resRawFile, resDestFile);
           }
-          //already copied
+          // already copied
           mApkDecoder.removeCopiedResFile(resRawFile.toPath());
           mTableStringsResguard.put(data, result);
         }
@@ -792,12 +816,12 @@ public class ARSCDecoder {
     }
   }
 
-  /**
-   * resource filtering, filtering duplicate resources, reducing the volume of apk
-   */
-  private MergeDuplicatedResInfo mergeDuplicated(File resRawFile, File resDestFile, String compatibaleraw, String result) throws IOException {
+  /** resource filtering, filtering duplicate resources, reducing the volume of apk */
+  private MergeDuplicatedResInfo mergeDuplicated(
+      File resRawFile, File resDestFile, String compatibaleraw, String result) throws IOException {
     MergeDuplicatedResInfo filterInfo = null;
-    List<MergeDuplicatedResInfo> mergeDuplicatedResInfoList = mMergeDuplicatedResInfoData.get(resRawFile.length());
+    List<MergeDuplicatedResInfo> mergeDuplicatedResInfoList =
+        mMergeDuplicatedResInfoData.get(resRawFile.length());
     if (mergeDuplicatedResInfoList != null) {
       for (MergeDuplicatedResInfo mergeDuplicatedResInfo : mergeDuplicatedResInfoList) {
         if (mergeDuplicatedResInfo.md5 == null) {
@@ -812,11 +836,17 @@ public class ARSCDecoder {
       }
     }
     if (filterInfo != null) {
-      generalFilterResIDMapping(compatibaleraw, result, filterInfo.originalName, filterInfo.fileName, resRawFile.length());
+      generalFilterResIDMapping(
+          compatibaleraw,
+          result,
+          filterInfo.originalName,
+          filterInfo.fileName,
+          resRawFile.length());
       mMergeDuplicatedResCount++;
       mMergeDuplicatedResTotalSize += resRawFile.length();
     } else {
-      MergeDuplicatedResInfo info = new MergeDuplicatedResInfo.Builder()
+      MergeDuplicatedResInfo info =
+          new MergeDuplicatedResInfo.Builder()
               .setFileName(result)
               .setFilePath(resDestFile.getAbsolutePath())
               .setOriginalName(compatibaleraw)
@@ -857,8 +887,8 @@ public class ARSCDecoder {
     short mcc = mIn.readShort();
     short mnc = mIn.readShort();
 
-    char[] language = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
-    char[] country = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
+    char[] language = new char[] {(char) mIn.readByte(), (char) mIn.readByte()};
+    char[] country = new char[] {(char) mIn.readByte(), (char) mIn.readByte()};
 
     byte orientation = mIn.readByte();
     byte touchscreen = mIn.readByte();
@@ -925,14 +955,14 @@ public class ARSCDecoder {
       BigInteger exceedingBI = new BigInteger(1, buf);
 
       if (exceedingBI.equals(BigInteger.ZERO)) {
-        LOGGER.fine(String.format("Config flags size > %d, but exceeding bytes are all zero, so it should be ok.",
-           KNOWN_CONFIG_BYTES
-        ));
+        LOGGER.fine(
+            String.format(
+                "Config flags size > %d, but exceeding bytes are all zero, so it should be ok.",
+                KNOWN_CONFIG_BYTES));
       } else {
-        LOGGER.warning(String.format("Config flags size > %d. Exceeding bytes: 0x%X.",
-           KNOWN_CONFIG_BYTES,
-           exceedingBI
-        ));
+        LOGGER.warning(
+            String.format(
+                "Config flags size > %d. Exceeding bytes: 0x%X.", KNOWN_CONFIG_BYTES, exceedingBI));
         isInvalid = true;
       }
     }
@@ -954,7 +984,7 @@ public class ARSCDecoder {
   }
 
   private void writeConfigFlags() throws IOException, AndrolibException {
-    //总的有多大
+    // 总的有多大
     int size = mIn.readInt();
     if (size < 28) {
       throw new AndrolibException("Config size < 28");
@@ -970,10 +1000,9 @@ public class ARSCDecoder {
 
   private void checkChunkType(int expectedType) throws AndrolibException {
     if (mHeader.type != expectedType) {
-      throw new AndrolibException(String.format("Invalid chunk type: expected=0x%08x, got=0x%08x",
-         expectedType,
-         mHeader.type
-      ));
+      throw new AndrolibException(
+          String.format(
+              "Invalid chunk type: expected=0x%08x, got=0x%08x", expectedType, mHeader.type));
     }
   }
 
@@ -987,24 +1016,28 @@ public class ARSCDecoder {
     return mHeader;
   }
 
-  private Header writeNextChunkCheck(int expectedType, int diffSize) throws IOException, AndrolibException {
+  private Header writeNextChunkCheck(int expectedType, int diffSize)
+      throws IOException, AndrolibException {
     mHeader = Header.readAndWriteHeader(mIn, mOut, diffSize);
     if (mHeader.type != expectedType) {
-      throw new AndrolibException(String.format("Invalid chunk type: expected=%d, got=%d", expectedType, mHeader.type));
+      throw new AndrolibException(
+          String.format("Invalid chunk type: expected=%d, got=%d", expectedType, mHeader.type));
     }
     return mHeader;
   }
 
-  /**
-   * 为了加速，不需要处理string,id,array，这几个是肯定不是的
-   */
+  /** 为了加速，不需要处理string,id,array，这几个是肯定不是的 */
   private boolean isToResguardFile(String name) {
     return (!name.equals("string") && !name.equals("id") && !name.equals("array"));
   }
 
   public static class Header {
-    public final static short TYPE_NONE = -1, TYPE_TABLE = 0x0002, TYPE_PACKAGE = 0x0200, TYPE_TYPE = 0x0201,
-       TYPE_SPEC_TYPE = 0x0202, TYPE_LIBRARY = 0x0203;
+    public static final short TYPE_NONE = -1,
+        TYPE_TABLE = 0x0002,
+        TYPE_PACKAGE = 0x0200,
+        TYPE_TYPE = 0x0201,
+        TYPE_SPEC_TYPE = 0x0202,
+        TYPE_LIBRARY = 0x0203;
 
     public final short type;
     public final int chunkSize;
@@ -1027,7 +1060,7 @@ public class ARSCDecoder {
     }
 
     public static Header readAndWriteHeader(ExtDataInput in, ExtDataOutput out, int diffSize)
-       throws IOException, AndrolibException {
+        throws IOException, AndrolibException {
       short type;
       int size;
       try {
@@ -1064,7 +1097,8 @@ public class ARSCDecoder {
     private String originalName;
     private String md5;
 
-    private MergeDuplicatedResInfo(String fileName, String filePath, String originalName, String md5) {
+    private MergeDuplicatedResInfo(
+        String fileName, String filePath, String originalName, String md5) {
       this.fileName = fileName;
       this.filePath = filePath;
       this.originalName = originalName;
@@ -1108,18 +1142,16 @@ public class ARSCDecoder {
     private final Set<Integer> mIsReplaced;
     private final Set<Integer> mIsWhiteList;
     private String[] mAToZ = {
-       "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
-       "w", "x", "y", "z"
+      "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
+      "t", "u", "v", "w", "x", "y", "z"
     };
     private String[] mAToAll = {
-       "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
-       "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+      "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "_", "a", "b", "c", "d", "e", "f", "g", "h",
+      "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
     };
     /**
-     * 在window上面有些关键字是不能作为文件名的
-     * CON, PRN, AUX, CLOCK$, NUL
-     * COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9
-     * LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
+     * 在window上面有些关键字是不能作为文件名的 CON, PRN, AUX, CLOCK$, NUL COM1, COM2, COM3, COM4, COM5, COM6, COM7,
+     * COM8, COM9 LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
      */
     private HashSet<String> mFileNameBlackList;
 
@@ -1195,7 +1227,8 @@ public class ARSCDecoder {
 
     public String getReplaceString() throws AndrolibException {
       if (mReplaceStringBuffer.isEmpty()) {
-        throw new AndrolibException(String.format("now can only proguard less than 35594 in a single type\n"));
+        throw new AndrolibException(
+            String.format("now can only proguard less than 35594 in a single type\n"));
       }
       return mReplaceStringBuffer.remove(0);
     }

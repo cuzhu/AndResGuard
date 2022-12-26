@@ -1,5 +1,7 @@
 package com.tencent.mm.androlib;
 
+import static com.tencent.mm.resourceproguard.InputParam.SignatureType.SchemaV3;
+
 import com.tencent.mm.androlib.res.decoder.ARSCDecoder;
 import com.tencent.mm.resourceproguard.Configuration;
 import com.tencent.mm.resourceproguard.InputParam;
@@ -18,15 +20,11 @@ import java.util.List;
 
 import apksigner.ApkSignerTool;
 
-import static com.tencent.mm.resourceproguard.InputParam.SignatureType.SchemaV3;
-
 /**
- * @author shwenzhang
- *     modified:
- * @author jonychina162
- *     为了使用v2签名，引入了google v2sign 模块
- *     由于使用v2签名，会对整个包除了签名块验证完整性，即除了签名块的内容在签名之后包其他内容不允许再改动，因此修改了原有的签名逻辑，
- *     现有逻辑：1 zipalign 2.sign 。具体请参考buildApkV2sign
+ * @author shwenzhang modified:
+ * @author jonychina162 为了使用v2签名，引入了google v2sign 模块
+ *     由于使用v2签名，会对整个包除了签名块验证完整性，即除了签名块的内容在签名之后包其他内容不允许再改动，因此修改了原有的签名逻辑， 现有逻辑：1 zipalign 2.sign
+ *     。具体请参考buildApkV2sign
  */
 public class ResourceApkBuilder {
 
@@ -56,7 +54,8 @@ public class ResourceApkBuilder {
     this.finalApkFile = finalApkFile;
   }
 
-  public void buildApkWithV1sign(HashMap<String, Integer> compressData) throws IOException, InterruptedException {
+  public void buildApkWithV1sign(HashMap<String, Integer> compressData)
+      throws IOException, InterruptedException {
     insureFileNameV1();
     generalUnsignApk(compressData);
     signApkV1(mUnSignedApk, mSignedApk);
@@ -76,7 +75,11 @@ public class ResourceApkBuilder {
     }
   }
 
-  public void buildApkWithV2V3Sign(HashMap<String, Integer> compressData, int minSDKVersion, InputParam.SignatureType signatureType) throws Exception {
+  public void buildApkWithV2V3Sign(
+      HashMap<String, Integer> compressData,
+      int minSDKVersion,
+      InputParam.SignatureType signatureType)
+      throws Exception {
     insureFileNameV2();
     generalUnsignApk(compressData);
     if (use7zApk(compressData, mUnSignedApk, m7ZipApk)) {
@@ -106,7 +109,8 @@ public class ResourceApkBuilder {
     mSignedWith7ZipApk = new File(mOutDir.getAbsolutePath(), mApkName + "_signed_7zip.apk");
     mSignedApk = new File(mOutDir.getAbsolutePath(), mApkName + "_signed.apk");
     mAlignedApk = new File(mOutDir.getAbsolutePath(), mApkName + "_signed_aligned.apk");
-    mAlignedWith7ZipApk = new File(mOutDir.getAbsolutePath(), mApkName + "_signed_7zip_aligned.apk");
+    mAlignedWith7ZipApk =
+        new File(mOutDir.getAbsolutePath(), mApkName + "_signed_7zip_aligned.apk");
     m7zipOutPutDir = new File(mOutDir.getAbsolutePath(), TypedValue.OUT_7ZIP_FILE_PATH);
   }
 
@@ -129,21 +133,23 @@ public class ResourceApkBuilder {
       return false;
     }
     if (!config.mUseSignAPK) {
-      throw new IOException("if you want to use 7z, you must enable useSign in the config file first");
+      throw new IOException(
+          "if you want to use 7z, you must enable useSign in the config file first");
     }
     if (!originalAPK.exists()) {
-      throw new IOException(String.format("can not found the signed apk file to 7z, if you want to use 7z, "
-                                          + "you must fill the sign data in the config file path=%s",
-          originalAPK.getAbsolutePath()
-      ));
+      throw new IOException(
+          String.format(
+              "can not found the signed apk file to 7z, if you want to use 7z, "
+                  + "you must fill the sign data in the config file path=%s",
+              originalAPK.getAbsolutePath()));
     }
     System.out.printf("use 7zip to repackage: %s, will cost much more time\n", outputAPK.getName());
     FileOperation.unZipAPk(originalAPK.getAbsolutePath(), m7zipOutPutDir.getAbsolutePath());
-    //首先一次性生成一个全部都是压缩的安装包
+    // 首先一次性生成一个全部都是压缩的安装包
     generalRaw7zip(outputAPK);
 
     ArrayList<String> storedFiles = new ArrayList<>();
-    //对于不压缩的要update回去
+    // 对于不压缩的要update回去
     for (String name : compressData.keySet()) {
       File file = new File(m7zipOutPutDir.getAbsolutePath(), name);
       if (!file.exists()) {
@@ -157,10 +163,10 @@ public class ResourceApkBuilder {
 
     addStoredFileIn7Zip(storedFiles, outputAPK);
     if (!outputAPK.exists()) {
-      throw new IOException(String.format(
-          "[use7zApk]7z repackage signed apk fail,you must install 7z command line version first, linux: p7zip, window: 7za, path=%s",
-          mSignedWith7ZipApk.getAbsolutePath()
-      ));
+      throw new IOException(
+          String.format(
+              "[use7zApk]7z repackage signed apk fail,you must install 7z command line version first, linux: p7zip, window: 7za, path=%s",
+              mSignedWith7ZipApk.getAbsolutePath()));
     }
     return true;
   }
@@ -172,7 +178,8 @@ public class ResourceApkBuilder {
     keyStore.load(fileIn, config.mStorePass.toCharArray());
     Key key = keyStore.getKey(config.mStoreAlias, config.mKeyPass.toCharArray());
     if (key == null) {
-      throw new RuntimeException("Can't get private key, please check if storepass storealias and keypass are correct");
+      throw new RuntimeException(
+          "Can't get private key, please check if storepass storealias and keypass are correct");
     }
     String keyAlgorithm = key.getAlgorithm();
     hash = formatHashAlgorithName(hash);
@@ -193,7 +200,8 @@ public class ResourceApkBuilder {
     return hash.replace("-", "");
   }
 
-  private void signApkV1(File unSignedApk, File signedApk) throws IOException, InterruptedException {
+  private void signApkV1(File unSignedApk, File signedApk)
+      throws IOException, InterruptedException {
     if (config.mUseSignAPK) {
       System.out.printf("signing apk: %s\n", signedApk.getName());
       if (signedApk.exists()) {
@@ -206,39 +214,46 @@ public class ResourceApkBuilder {
     }
   }
 
-  private void signApkV2V3(File unSignedApk, File signedApk, int minSDKVersion, InputParam.SignatureType signatureType) throws Exception {
+  private void signApkV2V3(
+      File unSignedApk, File signedApk, int minSDKVersion, InputParam.SignatureType signatureType)
+      throws Exception {
     if (config.mUseSignAPK) {
       System.out.printf("signing apk: %s\n", signedApk.getName());
       signWithV2V3Sign(unSignedApk, signedApk, minSDKVersion, signatureType);
       if (!signedApk.exists()) {
-        throw new IOException("Can't Generate signed APK v2. Plz check your v2sign info is correct.");
+        throw new IOException(
+            "Can't Generate signed APK v2. Plz check your v2sign info is correct.");
       }
     }
   }
 
-  private void signWithV2V3Sign(File unSignedApk, File signedApk, int minSDKVersion, InputParam.SignatureType signatureType) throws Exception {
-    String[] params = new String[] {
-        "sign",
-        "--ks",
-        config.mSignatureFile.getAbsolutePath(),
-        "--ks-pass",
-        "pass:" + config.mStorePass,
-        "--min-sdk-version",
-        String.valueOf(minSDKVersion),
-        "--ks-key-alias",
-        config.mStoreAlias,
-        "--key-pass",
-        "pass:" + config.mKeyPass,
-        "--v3-signing-enabled",
-        String.valueOf(signatureType == SchemaV3),
-        "--out",
-        signedApk.getAbsolutePath(),
-        unSignedApk.getAbsolutePath()
-    };
+  private void signWithV2V3Sign(
+      File unSignedApk, File signedApk, int minSDKVersion, InputParam.SignatureType signatureType)
+      throws Exception {
+    String[] params =
+        new String[] {
+          "sign",
+          "--ks",
+          config.mSignatureFile.getAbsolutePath(),
+          "--ks-pass",
+          "pass:" + config.mStorePass,
+          "--min-sdk-version",
+          String.valueOf(minSDKVersion),
+          "--ks-key-alias",
+          config.mStoreAlias,
+          "--key-pass",
+          "pass:" + config.mKeyPass,
+          "--v3-signing-enabled",
+          String.valueOf(signatureType == SchemaV3),
+          "--out",
+          signedApk.getAbsolutePath(),
+          unSignedApk.getAbsolutePath()
+        };
     ApkSignerTool.main(params);
   }
 
-  private void signWithV1sign(File unSignedApk, File signedApk) throws IOException, InterruptedException {
+  private void signWithV1sign(File unSignedApk, File signedApk)
+      throws IOException, InterruptedException {
     String signatureAlgorithm = "MD5withRSA";
     try {
       signatureAlgorithm = getSignatureAlgorithm(config.digestAlg);
@@ -246,27 +261,27 @@ public class ResourceApkBuilder {
       e.printStackTrace();
     }
     String[] argv = {
-        "jarsigner",
-        "-sigalg",
-        signatureAlgorithm,
-        "-digestalg",
-        config.digestAlg,
-        "-keystore",
-        config.mSignatureFile.getAbsolutePath(),
-        "-storepass",
-        config.mStorePass,
-        "-keypass",
-        config.mKeyPass,
-        "-signedjar",
-        signedApk.getAbsolutePath(),
-        unSignedApk.getAbsolutePath(),
-        config.mStoreAlias
+      "jarsigner",
+      "-sigalg",
+      signatureAlgorithm,
+      "-digestalg",
+      config.digestAlg,
+      "-keystore",
+      config.mSignatureFile.getAbsolutePath(),
+      "-storepass",
+      config.mStorePass,
+      "-keypass",
+      config.mKeyPass,
+      "-signedjar",
+      signedApk.getAbsolutePath(),
+      unSignedApk.getAbsolutePath(),
+      config.mStoreAlias
     };
     Utils.runExec(argv);
   }
 
   private void alignApks() throws IOException, InterruptedException {
-    //如果不签名就肯定不需要对齐了
+    // 如果不签名就肯定不需要对齐了
     if (!config.mUseSignAPK) {
       return;
     }
@@ -282,22 +297,26 @@ public class ResourceApkBuilder {
   }
 
   private void alignApk(File before, File after) throws IOException, InterruptedException {
-    System.out.printf("zipaligning apk: %s, exists:%b\n", before.getAbsolutePath(), before.exists());
+    System.out.printf(
+        "zipaligning apk: %s, exists:%b\n", before.getAbsolutePath(), before.exists());
     if (!before.exists()) {
-      throw new IOException(String.format("can not found the raw apk file to zipalign, path=%s",
-          before.getAbsolutePath()
-      ));
+      throw new IOException(
+          String.format(
+              "can not found the raw apk file to zipalign, path=%s", before.getAbsolutePath()));
     }
-    String cmd = Utils.isPresent(config.mZipalignPath) ? config.mZipalignPath : TypedValue.COMMAND_ZIPALIGIN;
+    String cmd =
+        Utils.isPresent(config.mZipalignPath) ? config.mZipalignPath : TypedValue.COMMAND_ZIPALIGIN;
     Utils.runCmd(cmd, "4", before.getAbsolutePath(), after.getAbsolutePath());
     if (!after.exists()) {
-      throw new IOException(String.format("can not found the aligned apk file, the ZipAlign path is correct? path=%s",
-          mAlignedApk.getAbsolutePath()
-      ));
+      throw new IOException(
+          String.format(
+              "can not found the aligned apk file, the ZipAlign path is correct? path=%s",
+              mAlignedApk.getAbsolutePath()));
     }
   }
 
-  private void generalUnsignApk(HashMap<String, Integer> compressData) throws IOException, InterruptedException {
+  private void generalUnsignApk(HashMap<String, Integer> compressData)
+      throws IOException, InterruptedException {
     System.out.printf("General unsigned apk: %s\n", mUnSignedApk.getName());
     File tempOutDir = new File(mOutDir.getAbsolutePath(), TypedValue.UNZIP_FILE_PATH);
     if (!tempOutDir.exists()) {
@@ -320,7 +339,7 @@ public class ResourceApkBuilder {
     }
 
     File destResDir = new File(mOutDir.getAbsolutePath(), "res");
-    //添加修改后的res文件
+    // 添加修改后的res文件
     if (!config.mKeepRoot && FileOperation.getlist(destResDir) == 0) {
       destResDir = new File(mOutDir.getAbsolutePath(), TypedValue.RES_FILE_PATH);
     }
@@ -329,22 +348,21 @@ public class ResourceApkBuilder {
      * NOTE:文件数量应该是一样的，如果不一样肯定有问题
      */
     File rawResDir = new File(tempOutDir.getAbsolutePath() + File.separator + "res");
-    System.out.printf("DestResDir %d rawResDir %d\n",
-        FileOperation.getlist(destResDir),
-        FileOperation.getlist(rawResDir)
-    );
-    if (FileOperation.getlist(destResDir) != (FileOperation.getlist(rawResDir) - ARSCDecoder.mMergeDuplicatedResCount)) {
-      throw new IOException(String.format(
-          "the file count of %s, and the file count of %s is not equal, there must be some problem\n",
-          rawResDir.getAbsolutePath(),
-          destResDir.getAbsolutePath()
-      ));
+    System.out.printf(
+        "DestResDir %d rawResDir %d\n",
+        FileOperation.getlist(destResDir), FileOperation.getlist(rawResDir));
+    if (FileOperation.getlist(destResDir)
+        != (FileOperation.getlist(rawResDir) - ARSCDecoder.mMergeDuplicatedResCount)) {
+      throw new IOException(
+          String.format(
+              "the file count of %s, and the file count of %s is not equal, there must be some problem\n",
+              rawResDir.getAbsolutePath(), destResDir.getAbsolutePath()));
     }
     if (!destResDir.exists()) {
       System.err.printf("Missing res files, path=%s\n", destResDir.getAbsolutePath());
       System.exit(-1);
     }
-    //这个需要检查混淆前混淆后，两个res的文件数量是否相等
+    // 这个需要检查混淆前混淆后，两个res的文件数量是否相等
     collectFiles.add(destResDir);
     File rawARSCFile = new File(mOutDir.getAbsolutePath() + File.separator + "resources.arsc");
     if (!rawARSCFile.exists()) {
@@ -355,7 +373,9 @@ public class ResourceApkBuilder {
     FileOperation.zipFiles(collectFiles, tempOutDir, mUnSignedApk, compressData);
 
     if (!mUnSignedApk.exists()) {
-      throw new IOException(String.format("can not found the unsign apk file path=%s", mUnSignedApk.getAbsolutePath()));
+      throw new IOException(
+          String.format(
+              "can not found the unsign apk file path=%s", mUnSignedApk.getAbsolutePath()));
     }
   }
 
@@ -365,7 +385,9 @@ public class ResourceApkBuilder {
       for (File metaFile : metaFiles) {
         String metaFileName = metaFile.getName();
         // Ignore signature files
-        if (!metaFileName.endsWith(".MF") && !metaFileName.endsWith(".RSA") && !metaFileName.endsWith(".SF")) {
+        if (!metaFileName.endsWith(".MF")
+            && !metaFileName.endsWith(".RSA")
+            && !metaFileName.endsWith(".SF")) {
           System.out.println(String.format("add meta file %s", metaFile.getAbsolutePath()));
           collectFiles.add(metaFile);
         }
@@ -375,14 +397,16 @@ public class ResourceApkBuilder {
 
   private void addStoredFileIn7Zip(ArrayList<String> storedFiles, File outSevenZipAPK)
       throws IOException, InterruptedException {
-    System.out.printf("[addStoredFileIn7Zip]rewrite the stored file into the 7zip, file count: %d\n",
-        storedFiles.size()
-    );
+    System.out.printf(
+        "[addStoredFileIn7Zip]rewrite the stored file into the 7zip, file count: %d\n",
+        storedFiles.size());
     if (storedFiles.size() == 0) return;
-    String storedParentName = mOutDir.getAbsolutePath() + File.separator + "storefiles" + File.separator;
+    String storedParentName =
+        mOutDir.getAbsolutePath() + File.separator + "storefiles" + File.separator;
     String outputName = m7zipOutPutDir.getAbsolutePath() + File.separator;
     for (String name : storedFiles) {
-      FileOperation.copyFileUsingStream(new File(outputName + name), new File(storedParentName + name));
+      FileOperation.copyFileUsingStream(
+          new File(outputName + name), new File(storedParentName + name));
     }
     storedParentName = storedParentName + File.separator + "*";
     String cmd = Utils.isPresent(config.m7zipPath) ? config.m7zipPath : TypedValue.COMMAND_7ZIP;

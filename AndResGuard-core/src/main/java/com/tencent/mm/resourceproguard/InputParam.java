@@ -1,6 +1,7 @@
 package com.tencent.mm.resourceproguard;
 
 import com.tencent.mm.androlib.res.util.StringUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -78,7 +79,9 @@ public class InputParam {
   }
 
   public enum SignatureType {
-    SchemaV1, SchemaV2, SchemaV3
+    SchemaV1,
+    SchemaV2,
+    SchemaV3
   }
 
   public static class Builder {
@@ -144,8 +147,8 @@ public class InputParam {
 
     public Builder setCompressFilePattern(ArrayList<String> compressFilePattern) {
       if (compressFilePattern.contains(Configuration.ASRC_FILE)) {
-        System.out.printf("[Warning] compress %s will prevent optimization at runtime",
-            Configuration.ASRC_FILE);
+        System.out.printf(
+            "[Warning] compress %s will prevent optimization at runtime", Configuration.ASRC_FILE);
       }
       this.compressFilePattern = compressFilePattern;
       return this;
@@ -236,11 +239,13 @@ public class InputParam {
         // Targeting R+ (version 30 and above) requires the resources.arsc of installed APKs
         // to be stored uncompressed and aligned on a 4-byte boundary
         this.compressFilePattern.remove(Configuration.ASRC_FILE);
-        System.out.printf("[Warning] Remove resources.arsc from the compressPattern. (%s)\n",
+        System.out.printf(
+            "[Warning] Remove resources.arsc from the compressPattern. (%s)\n",
             this.compressFilePattern);
       }
 
-      return new InputParam(mappingFile,
+      return new InputParam(
+          mappingFile,
           use7zip,
           useSign,
           keepRoot,
@@ -261,8 +266,7 @@ public class InputParam {
           finalApkBackupPath,
           digestAlg,
           minSDKVersion,
-          targetSDKVersion
-      );
+          targetSDKVersion);
     }
   }
 }

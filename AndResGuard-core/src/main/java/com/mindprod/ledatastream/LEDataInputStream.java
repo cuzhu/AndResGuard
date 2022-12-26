@@ -24,12 +24,11 @@ import java.io.InputStream;
 
 /**
  * Little-Endian version of DataInputStream.
- * <p>
- * Very similar to DataInputStream except it reads little-endian instead of
- * big-endian binary data. We can't extend DataInputStream directly since it has
- * only final methods, though DataInputStream itself is not final. This forces
- * us implement LEDataInputStream with a DataInputStream object, and use wrapper
- * methods.
+ *
+ * <p>Very similar to DataInputStream except it reads little-endian instead of big-endian binary
+ * data. We can't extend DataInputStream directly since it has only final methods, though
+ * DataInputStream itself is not final. This forces us implement LEDataInputStream with a
+ * DataInputStream object, and use wrapper methods.
  *
  * @author Roedy Green, Canadian Mind Products
  * @version 1.8 2007-05-24
@@ -38,27 +37,19 @@ import java.io.InputStream;
 public final class LEDataInputStream implements DataInput {
   // ------------------------------ CONSTANTS ------------------------------
 
-  /**
-   * undisplayed copyright notice.
-   */
+  /** undisplayed copyright notice. */
   private static final String EMBEDDED_COPYRIGHT =
       "copyright (c) 1999-2010 Roedy Green, Canadian Mind Products, http://mindprod.com";
 
   // ------------------------------ FIELDS ------------------------------
 
-  /**
-   * to get at the big-Endian methods of a basic DataInputStream
-   */
+  /** to get at the big-Endian methods of a basic DataInputStream */
   protected final DataInputStream dis;
 
-  /**
-   * to get at the a basic readBytes method.
-   */
+  /** to get at the a basic readBytes method. */
   protected final InputStream is;
 
-  /**
-   * work array for buffering input.
-   */
+  /** work array for buffering input. */
   protected final byte[] work;
 
   // -------------------------- PUBLIC STATIC METHODS
@@ -206,11 +197,10 @@ public final class LEDataInputStream implements DataInput {
   /**
    * Read a line.
    *
-   * @return a rough approximation of the 8-bit stream as a 16-bit unicode
-   *     string
+   * @return a rough approximation of the 8-bit stream as a 16-bit unicode string
    * @throws IOException ioexception
-   * @deprecated This method does not properly convert bytes to characters.
-   *     Use a Reader instead with a little-endian encoding.
+   * @deprecated This method does not properly convert bytes to characters. Use a Reader instead
+   *     with a little-endian encoding.
    */
   @Deprecated
   @Override
@@ -228,15 +218,15 @@ public final class LEDataInputStream implements DataInput {
   public final long readLong() throws IOException {
     dis.readFully(work, 0, 8);
     return (long) (work[7]) << 56
-           |
+        |
         /* long cast needed or shift done modulo 32 */
-           (long) (work[6] & 0xff) << 48
-           | (long) (work[5] & 0xff) << 40
-           | (long) (work[4] & 0xff) << 32
-           | (long) (work[3] & 0xff) << 24
-           | (long) (work[2] & 0xff) << 16
-           | (long) (work[1] & 0xff) << 8
-           | work[0] & 0xff;
+        (long) (work[6] & 0xff) << 48
+        | (long) (work[5] & 0xff) << 40
+        | (long) (work[4] & 0xff) << 32
+        | (long) (work[3] & 0xff) << 24
+        | (long) (work[2] & 0xff) << 16
+        | (long) (work[1] & 0xff) << 8
+        | work[0] & 0xff;
   }
 
   /**
@@ -262,8 +252,7 @@ public final class LEDataInputStream implements DataInput {
   }
 
   /**
-   * Read an unsigned byte. Note: returns an int, even though says Byte
-   * (non-Javadoc)
+   * Read an unsigned byte. Note: returns an int, even though says Byte (non-Javadoc)
    *
    * @throws IOException if read fails.
    * @see java.io.DataInput#readUnsignedByte()
@@ -274,8 +263,8 @@ public final class LEDataInputStream implements DataInput {
   }
 
   /**
-   * Read an unsigned short, 16 bits. Like DataInputStream.readUnsignedShort
-   * except little endian. Note, returns int even though it reads a short.
+   * Read an unsigned short, 16 bits. Like DataInputStream.readUnsignedShort except little endian.
+   * Note, returns int even though it reads a short.
    *
    * @return little-endian int from the stream.
    * @throws IOException if read fails.
@@ -287,10 +276,10 @@ public final class LEDataInputStream implements DataInput {
   }
 
   /**
-   * Skip over bytes in the stream. See the general contract of the
-   * <code>skipBytes</code> method of <code>DataInput</code>.
-   * <p>
-   * Bytes for this operation are read from the contained input stream.
+   * Skip over bytes in the stream. See the general contract of the <code>skipBytes</code> method of
+   * <code>DataInput</code>.
+   *
+   * <p>Bytes for this operation are read from the contained input stream.
    *
    * @param n the number of bytes to be skipped.
    * @return the actual number of bytes skipped.

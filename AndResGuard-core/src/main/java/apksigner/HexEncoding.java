@@ -18,22 +18,15 @@ package apksigner;
 
 import java.nio.ByteBuffer;
 
-/**
- * Hexadecimal encoding where each byte is represented by two hexadecimal digits.
- */
+/** Hexadecimal encoding where each byte is represented by two hexadecimal digits. */
 class HexEncoding {
 
   private static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
-  /**
-   * Hidden constructor to prevent instantiation.
-   */
-  private HexEncoding() {
-  }
+  /** Hidden constructor to prevent instantiation. */
+  private HexEncoding() {}
 
-  /**
-   * Encodes the provided data as a hexadecimal string.
-   */
+  /** Encodes the provided data as a hexadecimal string. */
   public static String encode(byte[] data, int offset, int length) {
     StringBuilder result = new StringBuilder(length * 2);
     for (int i = 0; i < length; i++) {
@@ -44,16 +37,12 @@ class HexEncoding {
     return result.toString();
   }
 
-  /**
-   * Encodes the provided data as a hexadecimal string.
-   */
+  /** Encodes the provided data as a hexadecimal string. */
   public static String encode(byte[] data) {
     return encode(data, 0, data.length);
   }
 
-  /**
-   * Encodes the remaining bytes of the provided {@link ByteBuffer} as a hexadecimal string.
-   */
+  /** Encodes the remaining bytes of the provided {@link ByteBuffer} as a hexadecimal string. */
   public static String encodeRemaining(ByteBuffer data) {
     return encode(data.array(), data.arrayOffset() + data.position(), data.remaining());
   }

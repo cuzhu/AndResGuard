@@ -1,11 +1,8 @@
 package com.tencent.mm.androlib;
 
-/**
- * @author shwenzhang
- */
+/** @author shwenzhang */
 public class AndrolibException extends Exception {
-  public AndrolibException() {
-  }
+  public AndrolibException() {}
 
   public AndrolibException(String message) {
     super(message);

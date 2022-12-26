@@ -1,20 +1,17 @@
 /**
- * Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com>
- * Copyright 2016 sim sun <sunsj1231@gmail.com>
+ * Copyright 2014 Ryszard Wiśniewski <brut.alll@gmail.com> Copyright 2016 sim sun
+ * <sunsj1231@gmail.com>
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.tencent.mm.androlib.res.decoder;
 
 import com.mindprod.ledatastream.LEDataInputStream;
@@ -22,6 +19,9 @@ import com.tencent.mm.androlib.AndrolibException;
 import com.tencent.mm.androlib.res.data.ResPackage;
 import com.tencent.mm.androlib.res.data.ResType;
 import com.tencent.mm.util.ExtDataInput;
+
+import org.apache.commons.io.input.CountingInputStream;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.apache.commons.io.input.CountingInputStream;
 
 /**
  * 其实应该是原来有，并且在白名单里面的才去掉！现在没有判断是否在白名单中
@@ -38,9 +37,9 @@ import org.apache.commons.io.input.CountingInputStream;
  * @author shwenzhang
  */
 public class RawARSCDecoder {
-  private final static short ENTRY_FLAG_COMPLEX = 0x0001;
-  private final static short ENTRY_FLAG_PUBLIC = 0x0002;
-  private final static short ENTRY_FLAG_WEAK = 0x0004;
+  private static final short ENTRY_FLAG_COMPLEX = 0x0001;
+  private static final short ENTRY_FLAG_PUBLIC = 0x0002;
+  private static final short ENTRY_FLAG_WEAK = 0x0004;
 
   private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
   private static final int KNOWN_CONFIG_BYTES = 64;
@@ -107,7 +106,8 @@ public class RawARSCDecoder {
 
     // TypeIdOffset was added platform_frameworks_base/@f90f2f8dc36e7243b85e0b6a7fd5a590893c827e
     // which is only in split/new applications.
-    int splitHeaderSize = (2 + 2 + 4 + 4 + (2 * 128) + (4 * 5)); // short, short, int, int, char[128], int * 4
+    int splitHeaderSize =
+        (2 + 2 + 4 + 4 + (2 * 128) + (4 * 5)); // short, short, int, int, char[128], int * 4
     if (mHeader.headerSize == splitHeaderSize) {
       mTypeIdOffset = mIn.readInt();
     }
@@ -216,7 +216,8 @@ public class RawARSCDecoder {
     }
   }
 
-  private void readComplexEntry(boolean flags, int specNamesId) throws IOException, AndrolibException {
+  private void readComplexEntry(boolean flags, int specNamesId)
+      throws IOException, AndrolibException {
     int parent = mIn.readInt();
     int count = mIn.readInt();
     for (int i = 0; i < count; i++) {
@@ -244,8 +245,8 @@ public class RawARSCDecoder {
     boolean isInvalid = false;
     short mcc = mIn.readShort();
     short mnc = mIn.readShort();
-    char[] language = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
-    char[] country = new char[] { (char) mIn.readByte(), (char) mIn.readByte() };
+    char[] language = new char[] {(char) mIn.readByte(), (char) mIn.readByte()};
+    char[] country = new char[] {(char) mIn.readByte(), (char) mIn.readByte()};
     byte orientation = mIn.readByte();
     byte touchscreen = mIn.readByte();
     int density = mIn.readUnsignedShort();
@@ -313,14 +314,14 @@ public class RawARSCDecoder {
       BigInteger exceedingBI = new BigInteger(1, buf);
 
       if (exceedingBI.equals(BigInteger.ZERO)) {
-        LOGGER.fine(String.format("Config flags size > %d, but exceeding bytes are all zero, so it should be ok.",
-            KNOWN_CONFIG_BYTES
-        ));
+        LOGGER.fine(
+            String.format(
+                "Config flags size > %d, but exceeding bytes are all zero, so it should be ok.",
+                KNOWN_CONFIG_BYTES));
       } else {
-        LOGGER.warning(String.format("Config flags size > %d. Exceeding bytes: 0x%X.",
-            KNOWN_CONFIG_BYTES,
-            exceedingBI
-        ));
+        LOGGER.warning(
+            String.format(
+                "Config flags size > %d. Exceeding bytes: 0x%X.", KNOWN_CONFIG_BYTES, exceedingBI));
       }
     } else {
       int remainingSize = size - read;
@@ -351,10 +352,9 @@ public class RawARSCDecoder {
 
   private void checkChunkType(int expectedType) throws AndrolibException {
     if (mHeader.type != expectedType) {
-      throw new AndrolibException(String.format("Invalid chunk type: expected=0x%08x, got=0x%08x",
-          expectedType,
-          mHeader.type
-      ));
+      throw new AndrolibException(
+          String.format(
+              "Invalid chunk type: expected=0x%08x, got=0x%08x", expectedType, mHeader.type));
     }
   }
 
@@ -373,12 +373,12 @@ public class RawARSCDecoder {
   }
 
   public static class Header {
-    public final static short TYPE_NONE = -1;
-    public final static short TYPE_TABLE = 0x0002;
-    public final static short TYPE_PACKAGE = 0x0200;
-    public final static short TYPE_TYPE = 0x0201;
-    public final static short TYPE_SPEC_TYPE = 0x0202;
-    public final static short TYPE_LIBRARY = 0x0203;
+    public static final short TYPE_NONE = -1;
+    public static final short TYPE_TABLE = 0x0002;
+    public static final short TYPE_PACKAGE = 0x0200;
+    public static final short TYPE_TYPE = 0x0201;
+    public static final short TYPE_SPEC_TYPE = 0x0202;
+    public static final short TYPE_LIBRARY = 0x0203;
     public final short type;
     public final int headerSize;
     public final int chunkSize;

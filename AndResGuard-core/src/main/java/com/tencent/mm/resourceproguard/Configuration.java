@@ -1,6 +1,14 @@
 package com.tencent.mm.resourceproguard;
 
 import com.tencent.mm.util.Utils;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,19 +20,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-/**
- * @author shwenzhang
- */
+/** @author shwenzhang */
 public class Configuration {
 
   public static final String DEFAULT_DIGEST_ALG = "SHA1";
@@ -72,17 +73,17 @@ public class Configuration {
   /**
    * use by command line with xml config
    *
-   * @param config        xml config file
-   * @param sevenzipPath  7zip bin file path
-   * @param zipAlignPath  zipalign bin file path
-   * @param mappingFile   mapping file
+   * @param config xml config file
+   * @param sevenzipPath 7zip bin file path
+   * @param zipAlignPath zipalign bin file path
+   * @param mappingFile mapping file
    * @param signatureFile signature file
-   * @param keypass       signature key password
-   * @param storealias    signature store alias
-   * @param storepass     signature store password
-   * @throws IOException                  io exception
+   * @param keypass signature key password
+   * @param storealias signature store alias
+   * @param storepass signature store password
+   * @throws IOException io exception
    * @throws ParserConfigurationException parse exception
-   * @throws SAXException                 sax exception
+   * @throws SAXException sax exception
    */
   public Configuration(
       File config,
@@ -92,7 +93,8 @@ public class Configuration {
       File signatureFile,
       String keypass,
       String storealias,
-      String storepass) throws IOException, ParserConfigurationException, SAXException {
+      String storepass)
+      throws IOException, ParserConfigurationException, SAXException {
     mWhiteList = new HashMap<>();
     mOldResMapping = new HashMap<>();
     mOldFileMapping = new HashMap<>();
@@ -146,14 +148,14 @@ public class Configuration {
     this.mZipalignPath = param.zipAlignPath;
   }
 
-  private void setSignData(
-      File signatureFile, String keypass, String storealias, String storepass) throws IOException {
+  private void setSignData(File signatureFile, String keypass, String storealias, String storepass)
+      throws IOException {
     mUseSignAPK = true;
     mSignatureFile = signatureFile;
     if (!mSignatureFile.exists()) {
-      throw new IOException(String.format("the signature file do not exit, raw path= %s\n",
-          mSignatureFile.getAbsolutePath()
-      ));
+      throw new IOException(
+          String.format(
+              "the signature file do not exit, raw path= %s\n", mSignatureFile.getAbsolutePath()));
     }
     mKeyPass = keypass;
     mStoreAlias = storealias;
@@ -165,15 +167,17 @@ public class Configuration {
       mOldMappingFile = mappingFile;
 
       if (!mOldMappingFile.exists()) {
-        throw new IOException(String.format("the old mapping file do not exit, raw path= %s",
-            mOldMappingFile.getAbsolutePath()
-        ));
+        throw new IOException(
+            String.format(
+                "the old mapping file do not exit, raw path= %s",
+                mOldMappingFile.getAbsolutePath()));
       }
       processOldMappingFile();
     }
   }
 
-  private void readXmlConfig(File xmlConfigFile) throws IOException, ParserConfigurationException, SAXException {
+  private void readXmlConfig(File xmlConfigFile)
+      throws IOException, ParserConfigurationException, SAXException {
     if (!xmlConfigFile.exists()) {
       return;
     }
@@ -267,14 +271,15 @@ public class Configuration {
     int packagePos = item.indexOf(".R.");
     if (packagePos == -1) {
 
-      throw new IOException(String.format("please write the full package name,eg com.tencent.mm.R.drawable.dfdf, but yours %s\n",
-          item
-      ));
+      throw new IOException(
+          String.format(
+              "please write the full package name,eg com.tencent.mm.R.drawable.dfdf, but yours %s\n",
+              item));
     }
-    //先去掉空格
+    // 先去掉空格
     item = item.trim();
     String packageName = item.substring(0, packagePos);
-    //不能通过lastDot
+    // 不能通过lastDot
     int nextDot = item.indexOf(".", packagePos + 3);
     String typeName = item.substring(packagePos + 3, nextDot);
     String name = item.substring(nextDot + 1);
@@ -297,7 +302,8 @@ public class Configuration {
     Pattern pattern = Pattern.compile(name);
     patterns.add(pattern);
     typeMap.put(typeName, patterns);
-    System.out.println(String.format("convertToPatternString typeName %s format %s", typeName, name));
+    System.out.println(
+        String.format("convertToPatternString typeName %s format %s", typeName, name));
     mWhiteList.put(packageName, typeMap);
   }
 
@@ -317,29 +323,35 @@ public class Configuration {
           String tagName = check.getTagName();
           String vaule = check.getAttribute(ATTR_VALUE);
           if (vaule.length() == 0) {
-            throw new IOException(String.format("Invalid config file: Missing required attribute %s\n", ATTR_VALUE));
+            throw new IOException(
+                String.format("Invalid config file: Missing required attribute %s\n", ATTR_VALUE));
           }
 
           switch (tagName) {
             case ATTR_SIGNFILE_PATH:
               char ch = vaule.charAt(0);
               switch (ch) {
-                // supports the writting style like ~/.android/debug.keystore. the symbol ~ represent the home directory of the current user.
+                  // supports the writting style like ~/.android/debug.keystore. the symbol ~
+                  // represent the home directory of the current user.
                 case '~':
-                  mSignatureFile = new File(String.format("%s%s", System.getProperty("user.home"), vaule.substring(1)));
+                  mSignatureFile =
+                      new File(
+                          String.format(
+                              "%s%s", System.getProperty("user.home"), vaule.substring(1)));
                   break;
-                // relative to the directory of the xml config file.
+                  // relative to the directory of the xml config file.
                 case '.':
                   mSignatureFile = new File(xmlConfigFileParentFile, vaule);
                   break;
-                // keep the origin logical.
+                  // keep the origin logical.
                 default:
                   mSignatureFile = new File(vaule);
               }
               if (!mSignatureFile.isFile()) {
-                throw new IOException(String.format("the signature file do not exit. raw path= %s\n",
-                    mSignatureFile.getAbsolutePath()
-                ));
+                throw new IOException(
+                    String.format(
+                        "the signature file do not exit. raw path= %s\n",
+                        mSignatureFile.getAbsolutePath()));
               }
               break;
             case ATTR_SIGNFILE_STOREPASS:
@@ -379,7 +391,8 @@ public class Configuration {
 
   private void addToCompressPatterns(String value) throws IOException {
     if (value.length() == 0) {
-      throw new IOException(String.format("Invalid config file: Missing required attribute %s\n", ATTR_VALUE));
+      throw new IOException(
+          String.format("Invalid config file: Missing required attribute %s\n", ATTR_VALUE));
     }
     value = Utils.convertToPatternString(value);
     Pattern pattern = Pattern.compile(value);
@@ -399,7 +412,8 @@ public class Configuration {
           Element check = (Element) child;
           String filePath = check.getAttribute(ATTR_VALUE);
           if (filePath.length() == 0) {
-            throw new IOException(String.format("Invalid config file: Missing required attribute %s\n", ATTR_VALUE));
+            throw new IOException(
+                String.format("Invalid config file: Missing required attribute %s\n", ATTR_VALUE));
           }
           readOldMapping(filePath);
         }
@@ -417,7 +431,8 @@ public class Configuration {
           String tagName = check.getTagName();
           String vaule = check.getAttribute(ATTR_VALUE);
           if (vaule.length() == 0) {
-            throw new IOException(String.format("Invalid config file: Missing required attribute %s\n", ATTR_VALUE));
+            throw new IOException(
+                String.format("Invalid config file: Missing required attribute %s\n", ATTR_VALUE));
           }
 
           switch (tagName) {
@@ -447,14 +462,15 @@ public class Configuration {
   private void readOldMapping(String filePath) throws IOException {
     mOldMappingFile = new File(filePath);
     if (!mOldMappingFile.exists()) {
-      throw new IOException(String.format("the old mapping file do not exit, raw path= %s\n",
-          mOldMappingFile.getAbsolutePath()
-      ));
+      throw new IOException(
+          String.format(
+              "the old mapping file do not exit, raw path= %s\n",
+              mOldMappingFile.getAbsolutePath()));
     }
     processOldMappingFile();
-    System.out.printf("you are using the keepmapping mode to proguard resouces: old mapping path:%s\n",
-        mOldMappingFile.getAbsolutePath()
-    );
+    System.out.printf(
+        "you are using the keepmapping mode to proguard resouces: old mapping path:%s\n",
+        mOldMappingFile.getAbsolutePath());
   }
 
   private void processOldMappingFile() throws IOException {
@@ -465,7 +481,8 @@ public class Configuration {
     try {
       fr = new FileReader(mOldMappingFile);
     } catch (FileNotFoundException ex) {
-      throw new IOException(String.format("Could not find old mapping file %s", mOldMappingFile.getAbsolutePath()));
+      throw new IOException(
+          String.format("Could not find old mapping file %s", mOldMappingFile.getAbsolutePath()));
     }
     BufferedReader br = new BufferedReader(fr);
     try {
@@ -481,17 +498,18 @@ public class Configuration {
             nameAfter = nameAfter.trim();
             nameBefore = nameBefore.trim();
 
-            //如果有这个的话，那就是mOldFileMapping
+            // 如果有这个的话，那就是mOldFileMapping
             if (line.contains("/")) {
               mOldFileMapping.put(nameBefore, nameAfter);
             } else {
-              //这里是resid的mapping
+              // 这里是resid的mapping
               int packagePos = nameBefore.indexOf(".R.");
               if (packagePos == -1) {
-                throw new IOException(String.format("the old mapping file packagename is malformed, "
-                                                    + "it should be like com.tencent.mm.R.attr.test, yours %s\n",
-                    nameBefore
-                ));
+                throw new IOException(
+                    String.format(
+                        "the old mapping file packagename is malformed, "
+                            + "it should be like com.tencent.mm.R.attr.test, yours %s\n",
+                        nameBefore));
               }
               String packageName = nameBefore.substring(0, packagePos);
               int nextDot = nameBefore.indexOf(".", packagePos + 3);
@@ -535,4 +553,3 @@ public class Configuration {
     }
   }
 }
-

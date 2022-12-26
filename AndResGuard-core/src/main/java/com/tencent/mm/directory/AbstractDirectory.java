@@ -1,17 +1,14 @@
 /**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.tencent.mm.directory;
 
 import java.io.InputStream;
@@ -186,7 +183,8 @@ public abstract class AbstractDirectory implements Directory {
 
     Map<String, AbstractDirectory> dirs = new LinkedHashMap<String, AbstractDirectory>(mDirs);
     for (Map.Entry<String, AbstractDirectory> dir : getAbstractDirs().entrySet()) {
-      for (Map.Entry<String, AbstractDirectory> subdir : dir.getValue().getAbstractDirs(true).entrySet()) {
+      for (Map.Entry<String, AbstractDirectory> subdir :
+          dir.getValue().getAbstractDirs(true).entrySet()) {
         dirs.put(dir.getKey() + separator + subdir.getKey(), subdir.getValue());
       }
     }
@@ -212,17 +210,17 @@ public abstract class AbstractDirectory implements Directory {
     return new ParsedPath(path.substring(0, pos), path.substring(pos + 1));
   }
 
-  abstract protected void loadFiles();
+  protected abstract void loadFiles();
 
-  abstract protected void loadDirs();
+  protected abstract void loadDirs();
 
-  abstract protected InputStream getFileInputLocal(String name) throws DirectoryException;
+  protected abstract InputStream getFileInputLocal(String name) throws DirectoryException;
 
-  abstract protected OutputStream getFileOutputLocal(String name) throws DirectoryException;
+  protected abstract OutputStream getFileOutputLocal(String name) throws DirectoryException;
 
-  abstract protected AbstractDirectory createDirLocal(String name) throws DirectoryException;
+  protected abstract AbstractDirectory createDirLocal(String name) throws DirectoryException;
 
-  abstract protected void removeFileLocal(String name);
+  protected abstract void removeFileLocal(String name);
 
   private class ParsedPath {
     public String dir;

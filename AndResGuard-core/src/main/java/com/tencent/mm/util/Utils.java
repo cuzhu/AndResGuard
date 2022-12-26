@@ -1,6 +1,7 @@
 package com.tencent.mm.util;
 
 import com.tencent.mm.androlib.res.util.StringUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,8 +35,8 @@ public class Utils {
     // ?	Zero or one character
     // *	Zero or more of character
     // +	One or more of character
-    final String[] searchList = new String[] { ".", "?", "*", "+" };
-    final String[] replacementList = new String[] { "\\.", ".?", ".*", ".+" };
+    final String[] searchList = new String[] {".", "?", "*", "+"};
+    final String[] replacementList = new String[] {"\\.", ".?", ".*", ".+"};
     return replaceEach(input, searchList, replacementList);
   }
 
@@ -43,7 +44,7 @@ public class Utils {
     if (patterns == null) {
       return false;
     }
-    for(Pattern p : patterns) {
+    for (Pattern p : patterns) {
       Boolean isMatch = p.matcher(str).matches();
       if (isMatch) return true;
     }
@@ -84,7 +85,8 @@ public class Utils {
       output = StringUtil.readInputStream(process.getInputStream());
       process.waitFor();
       if (process.exitValue() != 0) {
-        System.err.println(String.format("%s Failed! Please check your signature file.\n", argv[0]));
+        System.err.println(
+            String.format("%s Failed! Please check your signature file.\n", argv[0]));
         throw new RuntimeException(StringUtil.readInputStream(process.getErrorStream()));
       }
     } finally {
@@ -98,14 +100,13 @@ public class Utils {
   private static void processOutputStreamInThread(Process process) throws IOException {
     InputStreamReader ir = new InputStreamReader(process.getInputStream());
     LineNumberReader input = new LineNumberReader(ir);
-    //如果不读会有问题，被阻塞
-    while (input.readLine() != null) {
-    }
+    // 如果不读会有问题，被阻塞
+    while (input.readLine() != null) {}
   }
 
   private static String replaceEach(String text, String[] searchList, String[] replacementList) {
     // TODO: throw new IllegalArgumentException() if any param doesn't make sense
-    //validateParams(text, searchList, replacementList);
+    // validateParams(text, searchList, replacementList);
 
     SearchTracker tracker = new SearchTracker(text, searchList, replacementList);
     if (!tracker.hasNextMatch(0)) {

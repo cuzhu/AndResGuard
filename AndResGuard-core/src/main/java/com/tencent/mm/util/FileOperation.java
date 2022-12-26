@@ -146,7 +146,8 @@ public class FileOperation {
   }
 
   @SuppressWarnings("rawtypes")
-  public static HashMap<String, Integer> unZipAPk(String fileName, String filePath) throws IOException {
+  public static HashMap<String, Integer> unZipAPk(String fileName, String filePath)
+      throws IOException {
     checkDirectory(filePath);
     ZipFile zipFile = new ZipFile(fileName);
     Enumeration emu = zipFile.entries();
@@ -166,7 +167,7 @@ public class FileOperation {
         if (parent != null && (!parent.exists())) {
           parent.mkdirs();
         }
-        //要用linux的斜杠
+        // 要用linux的斜杠
         String compatibaleresult = entry.getName();
         if (compatibaleresult.contains("\\")) {
           compatibaleresult = compatibaleresult.replace("\\", "/");
@@ -200,13 +201,18 @@ public class FileOperation {
    * @throws IOException io exception
    */
   public static void zipFiles(
-      Collection<File> resFileList, File baseFolder, File zipFile, HashMap<String, Integer> compressData)
+      Collection<File> resFileList,
+      File baseFolder,
+      File zipFile,
+      HashMap<String, Integer> compressData)
       throws IOException {
-    ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile), BUFFER));
+    ZipOutputStream zipOut =
+        new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile), BUFFER));
     for (File resFile : resFileList) {
       if (resFile.exists()) {
         if (resFile.getAbsolutePath().contains(baseFolder.getAbsolutePath())) {
-          String relativePath = baseFolder.toURI().relativize(resFile.getParentFile().toURI()).getPath();
+          String relativePath =
+              baseFolder.toURI().relativize(resFile.getParentFile().toURI()).getPath();
           // remove slash at end of relativePath
           if (relativePath.length() > 1) {
             relativePath = relativePath.substring(0, relativePath.length() - 1);
@@ -223,7 +229,8 @@ public class FileOperation {
   }
 
   private static void zipFile(
-      File resFile, ZipOutputStream zipout, String rootpath, HashMap<String, Integer> compressData) throws IOException {
+      File resFile, ZipOutputStream zipout, String rootpath, HashMap<String, Integer> compressData)
+      throws IOException {
     rootpath = rootpath + (rootpath.trim().length() == 0 ? "" : File.separator) + resFile.getName();
     if (resFile.isDirectory()) {
       File[] fileList = resFile.listFiles();
@@ -232,13 +239,14 @@ public class FileOperation {
       }
     } else {
       final byte[] fileContents = readContents(resFile);
-      //这里需要强转成linux格式，果然坑！！
+      // 这里需要强转成linux格式，果然坑！！
       if (rootpath.contains("\\")) {
         rootpath = rootpath.replace("\\", "/");
       }
       if (!compressData.containsKey(rootpath)) {
-        System.err.printf(String.format("do not have the compress data path =%s in resource.asrc\n", rootpath));
-        //throw new IOException(String.format("do not have the compress data path=%s", rootpath));
+        System.err.printf(
+            String.format("do not have the compress data path =%s in resource.asrc\n", rootpath));
+        // throw new IOException(String.format("do not have the compress data path=%s", rootpath));
         return;
       }
       int compressMethod = compressData.get(rootpath);
