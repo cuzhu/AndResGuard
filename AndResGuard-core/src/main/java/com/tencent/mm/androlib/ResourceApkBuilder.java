@@ -2,7 +2,7 @@ package com.tencent.mm.androlib;
 
 import static com.tencent.mm.resourceproguard.InputParam.SignatureType.SchemaV3;
 
-import com.tencent.mm.androlib.res.decoder.ARSCDecoder;
+import com.tencent.mm.androlib.res.decoder.TanTanARSCDecoder;
 import com.tencent.mm.resourceproguard.Configuration;
 import com.tencent.mm.resourceproguard.InputParam;
 import com.tencent.mm.util.FileOperation;
@@ -352,7 +352,7 @@ public class ResourceApkBuilder {
         "DestResDir %d rawResDir %d\n",
         FileOperation.getlist(destResDir), FileOperation.getlist(rawResDir));
     if (FileOperation.getlist(destResDir)
-        != (FileOperation.getlist(rawResDir) - ARSCDecoder.mMergeDuplicatedResCount)) {
+        != (FileOperation.getlist(rawResDir) - TanTanARSCDecoder.mMergeDuplicatedResCount)) {
       throw new IOException(
           String.format(
               "the file count of %s, and the file count of %s is not equal, there must be some problem\n",

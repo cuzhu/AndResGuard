@@ -41,7 +41,7 @@ public class RawARSCDecoder {
   private static final short ENTRY_FLAG_PUBLIC = 0x0002;
   private static final short ENTRY_FLAG_WEAK = 0x0004;
 
-  private static final Logger LOGGER = Logger.getLogger(ARSCDecoder.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(TanTanARSCDecoder.class.getName());
   private static final int KNOWN_CONFIG_BYTES = 64;
 
   private static HashMap<Integer, Set<String>> mExistTypeNames;

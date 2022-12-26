@@ -1,8 +1,8 @@
 package com.tencent.mm.androlib;
 
 import com.tencent.mm.androlib.res.data.ResPackage;
-import com.tencent.mm.androlib.res.decoder.ARSCDecoder;
 import com.tencent.mm.androlib.res.decoder.RawARSCDecoder;
+import com.tencent.mm.androlib.res.decoder.TanTanARSCDecoder;
 import com.tencent.mm.androlib.res.util.ExtFile;
 import com.tencent.mm.directory.DirectoryException;
 import com.tencent.mm.resourceproguard.Configuration;
@@ -200,12 +200,12 @@ public class ApkDecoder {
       System.out.printf("decoding resources.arsc\n");
       RawARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"));
       ResPackage[] pkgs =
-          ARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"), this);
+          TanTanARSCDecoder.decode(apkFile.getDirectory().getFileInput("resources.arsc"), this);
 
       // 把没有纪录在resources.arsc的资源文件也拷进dest目录
       copyOtherResFiles();
 
-      ARSCDecoder.write(apkFile.getDirectory().getFileInput("resources.arsc"), this, pkgs);
+      TanTanARSCDecoder.write(apkFile.getDirectory().getFileInput("resources.arsc"), this, pkgs);
     }
   }
 
