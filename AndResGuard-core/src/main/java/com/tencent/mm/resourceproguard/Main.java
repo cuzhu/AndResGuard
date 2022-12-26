@@ -3,7 +3,7 @@ package com.tencent.mm.resourceproguard;
 import com.tencent.mm.androlib.AndrolibException;
 import com.tencent.mm.androlib.ApkDecoder;
 import com.tencent.mm.androlib.ResourceApkBuilder;
-import com.tencent.mm.androlib.res.decoder.ARSCDecoder;
+import com.tencent.mm.androlib.res.decoder.TanTanARSCDecoder;
 import com.tencent.mm.androlib.res.util.StringUtil;
 import com.tencent.mm.directory.DirectoryException;
 import com.tencent.mm.util.FileOperation;
@@ -66,8 +66,8 @@ public class Main {
 
   protected void clean() {
     config = null;
-    ARSCDecoder.mTableStringsResguard.clear();
-    ARSCDecoder.mMergeDuplicatedResCount = 0;
+    TanTanARSCDecoder.mTableStringsResguard.clear();
+    TanTanARSCDecoder.mMergeDuplicatedResCount = 0;
   }
 
   private void loadConfigFromGradle(InputParam inputParam) {

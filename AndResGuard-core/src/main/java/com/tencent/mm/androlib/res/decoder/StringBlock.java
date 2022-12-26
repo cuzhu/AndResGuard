@@ -270,9 +270,15 @@ public class StringBlock {
             (i == (stringCount - 1))
                 ? (block.m_strings.length - block.m_stringOffsets[i])
                 : (block.m_stringOffsets[i + 1] - block.m_stringOffsets[i]);
-        System.arraycopy(block.m_strings, block.m_stringOffsets[i], strings, offset, copyLen);
-        offset += copyLen;
-        totalSize += copyLen;
+        try {
+          System.arraycopy(block.m_strings, block.m_stringOffsets[i], strings, offset, copyLen);
+          offset += copyLen;
+          totalSize += copyLen;
+        } catch (IndexOutOfBoundsException e) {
+          System.out.printf(
+              "==i==%s==block.m_strings====%s===block.m_stringOffsets[i]====%s========offset====%s=======copyLen=====%s\n",
+              i, block.m_strings.length, block.m_stringOffsets[i], offset, copyLen);
+        }
       } else {
         String name = tableProguardMap.get(i);
         if (block.m_isUTF8) {
