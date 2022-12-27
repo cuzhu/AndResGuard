@@ -19,6 +19,8 @@ import com.tencent.mm.util.ExtDataInput;
 import com.tencent.mm.util.ExtDataOutput;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -439,6 +441,19 @@ public class StringBlock {
       length = val[1];
     }
     return decodeString(offset, length);
+  }
+
+  public String encodeToUtf8OrUtf16(String s) {
+    try {
+      if (m_isUTF8) {
+        return URLEncoder.encode(s, "UTF-8");
+      } else {
+        return URLEncoder.encode(s, "UTF-16LE");
+      }
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    return "";
   }
 
   /**

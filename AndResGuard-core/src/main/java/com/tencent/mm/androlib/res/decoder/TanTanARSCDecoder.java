@@ -572,7 +572,7 @@ public class TanTanARSCDecoder {
     generalResIDMapping(
         mPkg.getName(), mType.getName(), mSpecNames.get(specNamesId).toString(), replaceString);
     mPkg.putSpecNamesReplace(mResId, replaceString);
-    mPkg.putSpecNamesblock(unicodeToUtf8(replaceString), replaceString);
+    mPkg.putSpecNamesblock(mSpecNames.encodeToUtf8OrUtf16(replaceString), replaceString);
     mType.putSpecResguardName(replaceString);
   }
 
@@ -637,7 +637,9 @@ public class TanTanARSCDecoder {
         && mShouldResguardTypeSet.contains(mType.getName())) {
       if (mTableStringsResguard.get(data) == null) {
         String raw = mTableStrings.get(data).toString();
-        if (StringUtil.isBlank(raw) || raw.equalsIgnoreCase("null")) return;
+        if (StringUtil.isBlank(raw) || raw.equalsIgnoreCase("null")) {
+          return;
+        }
 
         String proguard = mPkg.getSpecRepplace(mResId);
         // 这个要写死这个，因为resources.arsc里面就是用这个
@@ -715,15 +717,6 @@ public class TanTanARSCDecoder {
         }
       }
     }
-  }
-
-  public String unicodeToUtf8(String s) {
-    try {
-      return URLEncoder.encode(s, "utf-8");
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    return "";
   }
 
   /** resource filtering, filtering duplicate resources, reducing the volume of apk */
@@ -942,6 +935,7 @@ public class TanTanARSCDecoder {
   }
 
   public static class Header {
+
     public static final short TYPE_NONE = -1,
         TYPE_TABLE = 0x0002,
         TYPE_PACKAGE = 0x0200,
@@ -992,6 +986,7 @@ public class TanTanARSCDecoder {
   }
 
   public static class FlagsOffset {
+
     public final int offset;
     public final int count;
 
@@ -1002,6 +997,7 @@ public class TanTanARSCDecoder {
   }
 
   private static class MergeDuplicatedResInfo {
+
     private String fileName;
     private String filePath;
     private String originalName;
@@ -1016,6 +1012,7 @@ public class TanTanARSCDecoder {
     }
 
     static class Builder {
+
       private String fileName;
       private String filePath;
       private String originalName;
@@ -1048,6 +1045,7 @@ public class TanTanARSCDecoder {
   }
 
   private class ResguardStringBuilder {
+
     private final Set<Integer> mIsReplaced;
     private final Set<Integer> mIsWhiteList;
 
